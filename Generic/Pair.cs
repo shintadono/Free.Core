@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Free.Core.Collections.Generic
+namespace Free.Core.Generic
 {
 	/// <summary>
 	/// TODO

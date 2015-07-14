@@ -64,7 +64,7 @@
     <Compile Include="Collections\Generic\LongList.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="IO\NonClosingStream.cs" />
-    <Compile Include="Collections\Generic\Pair.cs" />
+    <Compile Include="Generic\Pair.cs" />
     <Compile Include="Collections\Parameters.cs" />
     <Compile Include="Collections\Generic\PriorityQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
