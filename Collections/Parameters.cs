@@ -1595,6 +1595,41 @@ namespace Free.Core.Collections
 		}
 		#endregion
 
+		#region PDL
+		/// <summary>
+		/// Retrieves a PDL gramma encoded text representation of the <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="cooked">Set <b>true</b> to create a string formatted for human reading.</param>
+		/// <returns>The <b>string</b> containing the converted <see cref="Parameters"/>.</returns>
+		public string ToPDLString(bool cooked = true)
+		{
+			return ParametersToPDLConverter.ParametersToPDL(this, cooked);
+		}
+
+		/// <summary>
+		/// Saves the content of the <see cref="Parameters"/> into a file using PDL gramma.
+		/// </summary>
+		/// <param name="filename">The path and filename to the file.</param>
+		/// <param name="cooked">Set <b>true</b> to create a string formatted for human reading.</param>
+		/// <returns>The number of chars save to file.</returns>
+		public int SaveToPDLFile(string filename, bool cooked = true)
+		{
+			string pdlString = ParametersToPDLConverter.ParametersToPDL(this, cooked);
+			if (pdlString.Length == 0) pdlString = "{}";
+			if (cooked) pdlString += "\r\n";
+
+			try
+			{
+				File.WriteAllText(filename, pdlString, new UTF8Encoding());
+				return pdlString.Length;
+			}
+			catch
+			{
+				throw new Exception(string.Format("WriteToPDLFile: Error creating file. Maybe a wrong path, illegal filename or no permission to (over)write. ('{0}')", filename));
+			}
+		}
+		#endregion
+
 		#region ICloneable Members
 		/// <summary>
 		/// Returns a deep-clone of a <see cref="Parameters"/>.
