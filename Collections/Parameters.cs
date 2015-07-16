@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Free.Core.Collections.Internal;
 
 namespace Free.Core.Collections
 {
@@ -8,240 +11,14 @@ namespace Free.Core.Collections
 	/// A hierarchical dictionary, using string as keys, for storing parameters.
 	/// </summary>
 	[CLSCompliant(false)]
-	public class Parameters : ICloneable, IEnumerable
+	public class Parameters : ICloneable, IEquatable<Parameters>, IEnumerable
 	{
+		/// <summary>
+		/// The store for the data.
+		/// </summary>
 		Dictionary<string, object> items;
 
-		/// <summary>
-		/// Creates an instance.
-		/// </summary>
-		public Parameters()
-		{
-			items=new Dictionary<string, object>();
-		}
-
-		#region MakeKeyValuePair
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, bool value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, List<bool> value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, string value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, List<string> value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, double value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, List<double> value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, int value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, long value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, List<long> value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, Parameters value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public static Parameters MakeKeyValuePair(string name, List<Parameters> value)
-		{
-			Parameters keyValuePair=new Parameters();
-			keyValuePair.Add("$name$", name);
-			keyValuePair.Add("$value$", value);
-			return keyValuePair;
-		}
-		#endregion
-
-		#region Clone
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <returns></returns>
-		public object Clone()
-		{
-			Parameters ret=(Parameters)MemberwiseClone();
-			ret.items=new Dictionary<string, object>();
-			foreach(string key in items.Keys)
-			{
-				object o=Get(key);
-				if(o is byte[])
-				{
-					byte[] arr=(byte[])o;
-					byte[] val=new byte[arr.Length];
-					arr.CopyTo(val, 0); // Copy of the byte[]
-					ret.Add(key, val);
-				}
-				else if(o is List<string>)
-				{
-					List<string> list=(List<string>)o;
-					List<string> val=new List<string>(list); // Copy of the List<string>
-					ret.Add(key, val);
-				}
-				else if(o is List<long>)
-				{
-					List<long> list=(List<long>)o;
-					List<long> val=new List<long>(list); // Copy of the List<long>
-					ret.Add(key, val);
-				}
-				else if(o is List<bool>)
-				{
-					List<bool> list=(List<bool>)o;
-					List<bool> val=new List<bool>(list); // Copy of the List<bool>
-					ret.Add(key, val);
-				}
-				else if(o is List<double>)
-				{
-					List<double> list=(List<double>)o;
-					List<double> val=new List<double>(list); // Copy of the List<double>
-					ret.Add(key, val);
-				}
-				else if(o is List<Parameters>)
-				{
-					List<Parameters> list=(List<Parameters>)o;
-					List<Parameters> val=new List<Parameters>(list.Count);
-					foreach(Parameters p in list) val.Add((Parameters)p.Clone()); // Clone of the Parameters in the List<Parameters>
-					ret.Add(key, val);
-				}
-				else if(o is Parameters)
-				{
-					Parameters p=(Parameters)o;
-					ret.Add(key, (Parameters)(p.Clone()));  // Clonee of the Parameters
-				}
-				else
-				{
-					// Use Put instead of Add, since 'o' is of unknown type
-					ret.Put(key, o); // Copy of all other types
-				}
-			}
-
-			return ret;
-		}
-		#endregion
-
+		#region Statics
 		/// <summary>
 		/// Determines whether a string is allowed as a name of <see cref="Parameters"/>.
 		/// </summary>
@@ -252,21 +29,21 @@ namespace Free.Core.Collections
 		/// <returns><b>true</b> if the string is allowed as a name of <see cref="Parameters"/>; otherwise, <b>false</b>.</returns>
 		public static bool CheckName(string name)
 		{
-			int namelen=name.Length;
-			if(namelen<1) return false;
-			char c=name[0];
+			int namelen = name.Length;
+			if (namelen < 1) return false;
+			char c = name[0];
 
-			if(!(c>='a'&&c<='z')&&!(c>='A'&&c<='Z')&&(c!='$')&&(c!='_'))
+			if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && (c != '$') && (c != '_'))
 				return false;
 
-			int token=1;
+			int token = 1;
 
-			while(token<namelen)
+			while (token < namelen)
 			{
-				c=name[token++];
+				c = name[token++];
 
-				if(!(c>='a'&&c<='z')&&!(c>='A'&&c<='Z')&&
-					!(c>='0'&&c<='9')&&(c!='$')&&(c!='_'))
+				if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') &&
+					!(c >= '0' && c <= '9') && (c != '$') && (c != '_'))
 					return false;
 			}
 			return true;
@@ -280,30 +57,500 @@ namespace Free.Core.Collections
 		/// <returns>The list index, if string contains a list index; otherwise, -1.</returns>
 		static int ParseListIndex(string name, out string listname)
 		{
-			listname="";
+			listname = "";
 
-			if(name.Length<4) return -1; // 4: name+index+brackets
+			if (name.Length < 4) return -1; // 4: name+index+brackets
 
-			if(name[name.Length-1]!=']') return -1; // Last char must be ']'
+			if (name[name.Length - 1] != ']') return -1; // Last char must be ']'
 
-			int ind=name.IndexOf('[');
-			if(ind<1) return -1; // Nothing found, or string begins with '['
+			int ind = name.IndexOf('[');
+			if (ind < 1) return -1; // Nothing found, or string begins with '['
 
-			string indStr=name.Substring(ind+1, name.Length-(ind+2));
+			string indStr = name.Substring(ind + 1, name.Length - (ind + 2));
 
-			foreach(char c in indStr) if(c<'0'||c>'9') return -1; // only digits allowed, otherwise return -1
+			foreach (char c in indStr) if (c < '0' || c > '9') return -1; // only digits allowed, otherwise return -1
 
-			int ret=0;
-			if(!int.TryParse(indStr, out ret)) return -1;
+			int ret = 0;
+			if (!int.TryParse(indStr, out ret)) return -1;
 
-			listname=name.Substring(0, ind);
+			listname = name.Substring(0, ind);
+			return ret;
+		}
+		#endregion
+
+		#region Factories
+		/// <summary>
+		/// Reads a PDL gramma formatted file and returns the content as <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="filename">The path to the file.</param>
+		/// <returns>The parsed file content as <see cref="Parameters"/>.</returns>
+		public static Parameters FromPDLFile(string filename)
+		{
+			if (!File.Exists(filename)) throw new FileNotFoundException(string.Format("File not found. ('{0}')", filename));
+
+			using (StreamReader streamReader = new StreamReader(filename, Encoding.UTF8, true))
+			{
+				return PDLParser.Parse(streamReader);
+			}
+		}
+
+		/// <summary>
+		/// Converts a PDL gramma formatted string and returns the content as <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="text">The text to be converted.</param>
+		/// <param name="encoding">The text encoding to be used.</param>
+		/// <returns>The parsed text content as <see cref="Parameters"/>.</returns>
+		public static Parameters FromPDLString(string text, Encoding encoding = null)
+		{
+			if (encoding == null) encoding = Encoding.Unicode;
+
+			using (StreamReader streamReader = new StreamReader(new MemoryStream(encoding.GetBytes(text)), encoding))
+			{
+				return PDLParser.Parse(streamReader);
+			}
+		}
+
+		/// <summary>
+		/// Reads a PDL gramma formatted <see cref="Stream"/> and returns the content as <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="stream">The <see cref="Stream"/> to be parsed.</param>
+		/// <param name="encoding">The text encoding to be used.</param>
+		/// <returns>The parsed <paramref name="stream"/> content as <see cref="Parameters"/>.</returns>
+		public static Parameters FromPDLStream(Stream stream, Encoding encoding = null)
+		{
+			if (encoding == null) encoding = Encoding.Unicode;
+
+			using (StreamReader streamReader = new StreamReader(stream, encoding))
+			{
+				return PDLParser.Parse(streamReader);
+			}
+		}
+
+		/// <summary>
+		/// Reads a PDL gramma formatted <see cref="StreamReader"/> and returns the content as <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="stream">The <see cref="StreamReader"/> to be parsed.</param>
+		/// <returns>The parsed <paramref name="stream"/> content as <see cref="Parameters"/>.</returns>
+		public static Parameters FromPDLStream(StreamReader stream)
+		{
+			return PDLParser.Parse(stream);
+		}
+
+		/// <summary>
+		/// Converts command line arguments into <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="args">The command line arguments.</param>
+		/// <returns>The parsed command line as <see cref="Parameters"/>.</returns>
+		public static Parameters InterpretCommandLine(string[] args)
+		{
+			Parameters ret = new Parameters();
+			if (args.Length < 1) return ret;
+
+			int filecounter = 0;
+			foreach (string str in args)
+			{
+				if (str[0] == '-')
+				{
+					int idx = str.IndexOf(':');
+					if (idx >= 0)
+					{
+						string key = str.Substring(1, idx - 1);
+						if (key != "") ret.Add(key, str.Substring(idx + 1));
+					}
+					else
+					{
+						string key = str.Substring(1);
+						if (key != "") ret.Add(key, true);
+					}
+				}
+				else
+				{
+					string key = String.Format("file{0:000}", filecounter++);
+					ret.Add(key, str);
+				}
+			}
+
 			return ret;
 		}
 
-		internal void Put(string name, object val)
+		#region MakeKeyValuePair
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		/// <overloads>These functions create a key-value-pair <see cref="Parameters"/>.</overloads>
+		public static Parameters MakeKeyValuePair(string name, bool value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, List<bool> value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, string value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, List<string> value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, double value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, List<double> value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, int value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, long value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, List<long> value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, Parameters value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+
+		/// <summary>
+		/// Creates a key-value-pair <see cref="Parameters"/>.
+		/// </summary>
+		/// <remarks>
+		/// <code>
+		/// {
+		///    $name$=<paramref name="name"/>;
+		///    $value$=<paramref name="value"/>;
+		/// }
+		/// </code>
+		/// </remarks>
+		/// <param name="name">The name of the key-value-pair.</param>
+		/// <param name="value">The value of the key-value-pair.</param>
+		/// <returns>A <see cref="Parameters"/> containing the key-value-pair.</returns>
+		public static Parameters MakeKeyValuePair(string name, List<Parameters> value)
+		{
+			Parameters keyValuePair = new Parameters();
+			keyValuePair.Add("$name$", name);
+			keyValuePair.Add("$value$", value);
+			return keyValuePair;
+		}
+		#endregion
+		#endregion
+
+		/// <summary>
+		/// Creates an empty instance.
+		/// </summary>
+		public Parameters()
+		{
+			items=new Dictionary<string, object>();
+		}
+
+		/// <summary>
+		/// Retrieves the names of all parameters in the <see cref="Parameters"/>.
+		/// </summary>
+		/// <returns>A list of the names of all parameters in the <see cref="Parameters"/>.</returns>
+		public string[] GetNames()
+		{
+			string[] ret = new string[items.Keys.Count];
+			items.Keys.CopyTo(ret, 0);
+			return ret;
+		}
+
+		/// <summary>
+		/// Retrieves the number of parameters in the <see cref="Parameters"/>.
+		/// </summary>
+		public int Count { get { return items.Count; } }
+
+		/// <summary>
+		/// Retrieves an enumerable for the names in the <see cref="Parameters"/>.
+		/// </summary>
+		public IEnumerable<string> Keys { get { return items.Keys; } }
+
+		/// <summary>
+		/// Determines whether the <see cref="Parameters"/> is empty.
+		/// </summary>
+		/// <returns><b>true</b> if the <see cref="Parameters"/> is empty; otherwise, <b>false</b>.</returns>
+		public bool IsEmpty()
+		{
+			return items.Count == 0;
+		}
+
+		#region Get
+		/// <summary>
+		/// Retrieves an object from the <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
+		public object Get(string name, object std = null)
 		{
 			// Canonize key
-			string key=name.Replace('\\', '/');
+			string key = name.Replace('\\', '/');
+			while (key.IndexOf("//") != -1) key = key.Replace("//", "/");
+			key = key.Trim('/');
+
+			// Check key
+			if (key.Length == 0) return std;
+
+			return GetSub(key, std);
+		}
+
+		object GetSub(string name, object std)
+		{
+			int ind = name.IndexOf('/');
+
+			if (ind == -1) return GetLast(name, std);
+
+			string key = name.Substring(0, ind);
+			string subkey = name.Substring(ind + 1);
+
+			string listname = "";
+			int idx = ParseListIndex(key, out listname);
+
+			Parameters p = null;
+			if (idx == -1)
+			{
+				if (!CheckName(key)) return std;
+				if (!items.ContainsKey(key)) return std;
+
+				p = items[key] as Parameters;
+				if (p == null) return std;
+
+				return p.GetSub(subkey, std);
+			}
+
+			if (!CheckName(listname)) return std;
+			if (!items.ContainsKey(listname)) return std;
+
+			List<Parameters> pl = items[listname] as List<Parameters>;
+			if (pl == null) return std;
+
+			if (idx >= pl.Count) return std;
+
+			p = pl[idx];
+			return p.GetSub(subkey, std);
+		}
+
+		object GetLast(string name, object std)
+		{
+			string listname = "";
+			int idx = ParseListIndex(name, out listname);
+
+			if (idx == -1)
+			{
+				if (!CheckName(name)) return std;
+				if (!items.ContainsKey(name)) return std;
+
+				return items[name];
+			}
+			else
+			{
+				if (!CheckName(listname)) return std;
+				if (!items.ContainsKey(listname)) return std;
+
+				ICollection list = Get(listname) as ICollection;
+				if (list == null) return std;
+
+				if (idx >= list.Count) return std;
+
+				IList ilist = list as IList;
+				return ilist[idx];
+			}
+		}
+		#endregion
+
+		#region Put
+		/// <summary>
+		/// Puts a value into a (sub-parameters) store. Called recursive for each sub-parameters in <paramref name="path"/>.
+		/// </summary>
+		/// <param name="path">The path (name) for the value.</param>
+		/// <param name="val">The value to be stored.</param>
+		void Put(string path, object val)
+		{
+			// Canonize key
+			string key=path.Replace('\\', '/');
 			while(key.IndexOf("//")!=-1) key=key.Replace("//", "/");
 			key=key.Trim('/');
 
@@ -327,15 +574,20 @@ namespace Free.Core.Collections
 			else PutSub(key, val);
 		}
 
-		void PutSub(string name, object val)
+		/// <summary>
+		/// Puts a value into a new sub-parameter store. Called recursive for each sub-parameters in <paramref name="path"/>.
+		/// </summary>
+		/// <param name="path">The path (name) for the value.</param>
+		/// <param name="val">The value to be stored.</param>
+		void PutSub(string path, object val)
 		{
-			int ind=name.IndexOf('/');
+			int ind=path.IndexOf('/');
 
 			// Sub-Parameters?
 			if(ind!=-1)
 			{
-				string mainkey=name.Substring(0, ind);
-				string subkey=name.Substring(ind+1);
+				string mainkey=path.Substring(0, ind);
+				string subkey=path.Substring(ind+1);
 
 				Parameters newp=new Parameters();
 				newp.PutSub(subkey, val);
@@ -344,9 +596,14 @@ namespace Free.Core.Collections
 				return;
 			}
 
-			PutLast(name, val);
+			PutLast(path, val);
 		}
 
+		/// <summary>
+		/// Puts a value into the store.
+		/// </summary>
+		/// <param name="name">The name for the value.</param>
+		/// <param name="val">The value to be stored.</param>
 		void PutLast(string name, object val)
 		{
 			string listname="";
@@ -552,258 +809,329 @@ namespace Free.Core.Collections
 				#endregion
 			}
 		}
+		#endregion
 
-		#region Add methods
+		#region Contains
 		/// <summary>
-		/// TODO
+		/// Determines whether a parameter with a specified (path) name exists in the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name of the parameter.</param>
+		/// <returns><b>true</b> the the parameter exists in the <see cref="Parameters"/>; otherwise, <b>false</b>.</returns>
+		public bool Contains(string name)
+		{
+			// Canonize key
+			string key = name.Replace('\\', '/');
+			while (key.IndexOf("//") != -1) key = key.Replace("//", "/");
+			key = key.Trim('/');
+
+			// Check key
+			if (key.Length == 0) return false;
+
+			return ContainsSub(key);
+		}
+
+		bool ContainsSub(string name)
+		{
+			int ind = name.IndexOf('/');
+
+			if (ind == -1) return ContainsLast(name);
+
+			string key = name.Substring(0, ind);
+			string subkey = name.Substring(ind + 1);
+
+			string listname = "";
+			int idx = ParseListIndex(key, out listname);
+
+			Parameters p = null;
+			if (idx == -1)
+			{
+				if (!CheckName(key)) return false;
+				if (!items.ContainsKey(key)) return false;
+
+				p = items[key] as Parameters;
+				if (p == null) return false;
+
+				return p.ContainsSub(subkey);
+			}
+
+			if (!CheckName(listname)) return false;
+			if (!items.ContainsKey(listname)) return false;
+
+			List<Parameters> pl = items[listname] as List<Parameters>;
+			if (pl == null) return false;
+
+			if (idx >= pl.Count) return false;
+
+			p = pl[idx];
+			return p.ContainsSub(subkey);
+		}
+
+		bool ContainsLast(string name)
+		{
+			string listname = "";
+			int idx = ParseListIndex(name, out listname);
+
+			if (idx == -1)
+			{
+				if (!CheckName(name)) return false;
+				return items.ContainsKey(name);
+			}
+			else
+			{
+				if (!CheckName(listname)) return false;
+				if (!items.ContainsKey(listname)) return false;
+
+				ICollection list = Get(listname) as ICollection;
+				if (list == null) return false;
+
+				return (idx < list.Count);
+			}
+		}
+		#endregion
+
+		#region Typed Add methods
+		/// <summary>
+		/// Adds a value to the <see cref="Parameters"/>.
+		/// </summary>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
+		/// <overloads>These functions add values to the <see cref="Parameters"/>.</overloads>
 		public Parameters Add(string name, bool val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, sbyte val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, short val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, int val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, long val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, byte val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, ushort val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, uint val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, ulong val) { Put(name, (long)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, float val) { Put(name, (double)val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, double val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, string val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, Parameters val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, byte[] val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, List<bool> val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, List<long> val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, List<double> val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, List<string> val) { Put(name, val); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, string[] val) { Put(name, new List<string>(val)); return this; }
 
 		/// <summary>
-		/// TODO
+		/// Adds a value to the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="val"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name for the value.</param>
+		/// <param name="val">The value to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
 		public Parameters Add(string name, List<Parameters> val) { Put(name, val); return this; }
-		#endregion
 
 		/// <summary>
-		/// Retrieves an object from the Parameters.
+		/// Inserts (shallow add) all values from an Parameters into this Parameter.
+		/// </summary>
+		/// <param name="values">The values to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
+		public Parameters Add(Parameters values)
+		{
+			foreach (string key in values.items.Keys) Put(key, values.items[key]);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Recursivly add all values from an Parameters into this Parameter.
+		/// Existing values (except Parameters) will be overwritten.
+		/// </summary>
+		/// <param name="values">The values to add.</param>
+		/// <returns>The <see cref="Parameters"/>.</returns>
+		public Parameters AddDeep(Parameters values)
+		{
+			foreach (string key in values.items.Keys)
+			{
+				if (!items.ContainsKey(key))
+				{
+					Put(key, values.items[key]);
+					continue;
+				}
+
+				object valThis = items[key];
+				bool fPThis = (valThis is Parameters);
+
+				object valThat = values.items[key];
+				bool fPThat = (valThat is Parameters);
+
+				// Both Parameters => add recursivly
+				if (fPThis && fPThat)
+				{
+					((Parameters)valThis).AddDeep((Parameters)valThat);
+					continue;
+				}
+
+				// Both non-Parameters => replace
+				if (!fPThis && !fPThat)
+				{
+					Put(key, valThat);
+					continue;
+				}
+
+				Parameters p;
+
+				if (fPThis)
+				{
+					p = (Parameters)valThis;
+					object o = valThat;
+
+					// Store non-Parameters as "$default$" entry in the Parameters
+					p.Put("$default$", o);
+				}
+				else
+				{
+					p = (Parameters)valThat;
+					object o = valThis;
+
+					// Store non-Parameters as "$default$" entry in the Parameters
+					p.Put("$default$", o);
+
+					Add(key, p);
+				}
+			}
+
+			return this;
+		}
+		#endregion
+
+		#region Typed Get methods
+		/// <summary>
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
 		/// <param name="name">The path to the object.</param>
 		/// <param name="std">Fallback value.</param>
 		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
-		public object Get(string name, object std=null)
-		{
-			// Canonize key
-			string key=name.Replace('\\', '/');
-			while(key.IndexOf("//")!=-1) key=key.Replace("//", "/");
-			key=key.Trim('/');
-
-			// Check key
-			if(key.Length==0) return std;
-
-			return innerGet(key, std);
-		}
-
-		object innerGetLast(string name, object std)
-		{
-			string listname="";
-			int idx=ParseListIndex(name, out listname);
-
-			if(idx==-1)
-			{
-				if(!CheckName(name)) return std;
-				if(!items.ContainsKey(name)) return std;
-
-				return items[name];
-			}
-			else
-			{
-				if(!CheckName(listname)) return std;
-				if(!items.ContainsKey(listname)) return std;
-
-				ICollection list=Get(listname) as ICollection;
-				if(list==null) return std;
-
-				if(idx>=list.Count) return std;
-
-				IList ilist=list as IList;
-				return ilist[idx];
-			}
-		}
-
-		object innerGet(string name, object std)
-		{
-			int ind=name.IndexOf('/');
-
-			if(ind==-1) return innerGetLast(name, std);
-
-			string key=name.Substring(0, ind);
-			string subkey=name.Substring(ind+1);
-
-			string listname="";
-			int idx=ParseListIndex(key, out listname);
-
-			Parameters p=null;
-			if(idx==-1)
-			{
-				if(!CheckName(key)) return std;
-				if(!items.ContainsKey(key)) return std;
-
-				p=items[key] as Parameters;
-				if(p==null) return std;
-
-				return p.innerGet(subkey, std);
-			}
-
-			if(!CheckName(listname)) return std;
-			if(!items.ContainsKey(listname)) return std;
-
-			List<Parameters> pl=items[listname] as List<Parameters>;
-			if(pl==null) return std;
-
-			if(idx>=pl.Count) return std;
-
-			p=pl[idx];
-			return p.innerGet(subkey, std);
-		}
-
-		#region Typed Get methods
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
 		public bool GetBool(string name, bool std=false)
 		{
 			object o=Get(name, std);
@@ -824,22 +1152,22 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public int GetInt32(string name, int std=0)
 		{
 			return (int)GetInt(name, std);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public long GetInt(string name, long std=0)
 		{
 			object o=Get(name, std);
@@ -851,11 +1179,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public double GetDouble(string name, double std=0)
 		{
 			object o=Get(name, std);
@@ -867,11 +1195,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public string GetString(string name, string std="")
 		{
 			object o=Get(name, std);
@@ -882,11 +1210,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public Parameters GetParameters(string name, Parameters std=null)
 		{
 			object o=Get(name, std);
@@ -897,11 +1225,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public byte[] GetDataBlock(string name, byte[] std=null)
 		{
 			object o=Get(name, std);
@@ -912,11 +1240,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<bool> GetBoolList(string name, List<bool> std=null)
 		{
 			object o=Get(name, std);
@@ -927,11 +1255,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<long> GetIntList(string name, List<long> std=null)
 		{
 			object o=Get(name, std);
@@ -942,11 +1270,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<double> GetDoubleList(string name, List<double> std=null)
 		{
 			object o=Get(name, std);
@@ -957,11 +1285,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<string> GetStringList(string name, List<string> std=null)
 		{
 			object o=Get(name, std);
@@ -972,11 +1300,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<Parameters> GetParametersList(string name, List<Parameters> std=null)
 		{
 			object o=Get(name, std);
@@ -987,10 +1315,10 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a key-value-pair <see cref="Parameters"/> from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <returns>A dictionary containing the key-value-pairs.</returns>
 		public Dictionary<string, object> GetKeyValueList(string name)
 		{
 			Dictionary<string, object> ret=new Dictionary<string, object>();
@@ -1009,11 +1337,11 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="std"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <param name="std">Fallback value.</param>
+		/// <returns>The requested object, if successful; otherwise, <paramref name="std"/>.</returns>
 		public List<double> GetAsDoubleList(string name, List<double> std=null)
 		{
 			object o=Get(name, std);
@@ -1031,41 +1359,35 @@ namespace Free.Core.Collections
 		}
 
 		/// <summary>
-		/// TODO
+		/// Retrieves a value from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
+		/// <param name="name">The path to the object.</param>
+		/// <returns>The requested object, if successful; otherwise, an empty string is returned.</returns>
 		public string GetAsString(string name)
 		{
-			object o=Get(name, "");
+			object o=Get(name, string.Empty);
 			return o.ToString();
 		}
-		#endregion
 
 		/// <summary>
-		/// TODO
+		/// Retrieves all values, that start with "file".
 		/// </summary>
-		/// <returns></returns>
-		public string[] GetNames()
+		/// <returns>A list of all values, that start with "file".</returns>
+		public List<string> GetFilesFromParameters()
 		{
-			string[] ret=new string[items.Keys.Count];
-			items.Keys.CopyTo(ret, 0);
+			List<string> ret = new List<string>();
+
+			foreach (string i in GetNames())
+			{
+				if (i.StartsWith("file"))
+				{
+					ret.Add(GetString(i));
+				}
+			}
+
 			return ret;
 		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public int Count { get { return items.Count; } }
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <returns></returns>
-		public bool IsEmpty()
-		{
-			return items.Count==0;
-		}
+		#endregion
 
 		#region GetHash
 		static long GetHash(double value, long hc)
@@ -1207,95 +1529,17 @@ namespace Free.Core.Collections
 		}
 		#endregion
 
-		#region Contains
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		public bool Contains(string name)
-		{
-			// Canonize key
-			string key=name.Replace('\\', '/');
-			while(key.IndexOf("//")!=-1) key=key.Replace("//", "/");
-			key=key.Trim('/');
-
-			// Check key
-			if(key.Length==0) return false;
-
-			return innerContains(key);
-		}
-
-		bool innerContainsLast(string name)
-		{
-			string listname="";
-			int idx=ParseListIndex(name, out listname);
-
-			if(idx==-1)
-			{
-				if(!CheckName(name)) return false;
-				return items.ContainsKey(name);
-			}
-			else
-			{
-				if(!CheckName(listname)) return false;
-				if(!items.ContainsKey(listname)) return false;
-
-				ICollection list=Get(listname) as ICollection;
-				if(list==null) return false;
-
-				return (idx<list.Count);
-			}
-		}
-
-		bool innerContains(string name)
-		{
-			int ind=name.IndexOf('/');
-
-			if(ind==-1) return innerContainsLast(name);
-
-			string key=name.Substring(0, ind);
-			string subkey=name.Substring(ind+1);
-
-			string listname="";
-			int idx=ParseListIndex(key, out listname);
-
-			Parameters p=null;
-			if(idx==-1)
-			{
-				if(!CheckName(key)) return false;
-				if(!items.ContainsKey(key)) return false;
-
-				p=items[key] as Parameters;
-				if(p==null) return false;
-
-				return p.innerContains(subkey);
-			}
-
-			if(!CheckName(listname)) return false;
-			if(!items.ContainsKey(listname)) return false;
-
-			List<Parameters> pl=items[listname] as List<Parameters>;
-			if(pl==null) return false;
-
-			if(idx>=pl.Count) return false;
-
-			p=pl[idx];
-			return p.innerContains(subkey);
-		}
-		#endregion
-
 		#region Remove & Clear
 		/// <summary>
-		/// TODO
+		/// Clears the <see cref="Parameters"/>.
 		/// </summary>
 		public void Clear() { items.Clear(); }
 
 		/// <summary>
-		/// TODO
+		/// Removes a parameter from the <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
+		/// <param name="name">The (path) name of the parameter.</param>
+		/// <returns><b>true</b> if successful; otherwise, <b>false</b>.</returns>
 		public bool Remove(string name)
 		{
 			// Canonize key
@@ -1333,7 +1577,7 @@ namespace Free.Core.Collections
 					{
 						ilist.RemoveAt(idx);
 					}
-					catch(Exception)
+					catch
 					{
 						return false;
 					}
@@ -1351,266 +1595,200 @@ namespace Free.Core.Collections
 		}
 		#endregion
 
+		#region ICloneable Members
 		/// <summary>
-		/// Inserts (shallow add) all values from an Parameters into this Parameter.
+		/// Returns a deep-clone of a <see cref="Parameters"/>.
 		/// </summary>
-		/// <param name="values"></param>
-		/// <returns></returns>
-		public Parameters Add(Parameters values)
+		/// <returns>The clone of the <see cref="Parameters"/>.</returns>
+		public object Clone()
 		{
-			foreach(string key in values.items.Keys) Put(key, values.items[key]);
+			Parameters ret = (Parameters)MemberwiseClone();
 
-			return this;
-		}
-
-		/// <summary>
-		/// Recursivly add all values from an Parameters into this Parameter.
-		/// Existing values (except Parameters) will be overwritten.
-		/// </summary>
-		/// <param name="values"></param>
-		/// <returns></returns>
-		public Parameters AddDeep(Parameters values)
-		{
-			foreach(string key in values.items.Keys)
+			ret.items = new Dictionary<string, object>();
+			foreach (string key in items.Keys)
 			{
-				if(!items.ContainsKey(key))
+				object o = Get(key);
+				if (o is byte[])
 				{
-					Put(key, values.items[key]);
-					continue;
+					byte[] arr = (byte[])o;
+					byte[] val = new byte[arr.Length];
+					arr.CopyTo(val, 0); // Copy of the byte[]
+					ret.Add(key, val);
 				}
-
-				object valThis=items[key];
-				bool fPThis=(valThis is Parameters);
-
-				object valThat=values.items[key];
-				bool fPThat=(valThat is Parameters);
-
-				// Both Parameters => add recursivly
-				if(fPThis&&fPThat)
+				else if (o is List<string>)
 				{
-					((Parameters)valThis).AddDeep((Parameters)valThat);
-					continue;
+					List<string> list = (List<string>)o;
+					List<string> val = new List<string>(list); // Copy of the List<string>
+					ret.Add(key, val);
 				}
-
-				// Both non-Parameters => replace
-				if(!fPThis&&!fPThat)
+				else if (o is List<long>)
 				{
-					Put(key, valThat);
-					continue;
+					List<long> list = (List<long>)o;
+					List<long> val = new List<long>(list); // Copy of the List<long>
+					ret.Add(key, val);
 				}
-
-				Parameters p;
-
-				if(fPThis)
+				else if (o is List<bool>)
 				{
-					p=(Parameters)valThis;
-					object o=valThat;
-
-					// Store non-Parameters as "$default$" entry in the Parameters
-					p.Put("$default$", o);
+					List<bool> list = (List<bool>)o;
+					List<bool> val = new List<bool>(list); // Copy of the List<bool>
+					ret.Add(key, val);
+				}
+				else if (o is List<double>)
+				{
+					List<double> list = (List<double>)o;
+					List<double> val = new List<double>(list); // Copy of the List<double>
+					ret.Add(key, val);
+				}
+				else if (o is List<Parameters>)
+				{
+					List<Parameters> list = (List<Parameters>)o;
+					List<Parameters> val = new List<Parameters>(list.Count);
+					foreach (Parameters p in list) val.Add((Parameters)p.Clone()); // Clone of the Parameters in the List<Parameters>
+					ret.Add(key, val);
+				}
+				else if (o is Parameters)
+				{
+					Parameters p = (Parameters)o;
+					ret.Add(key, (Parameters)(p.Clone())); // Clonee of the Parameters
 				}
 				else
 				{
-					p=(Parameters)valThat;
-					object o=valThis;
-
-					// Store non-Parameters as "$default$" entry in the Parameters
-					p.Put("$default$", o);
-
-					Add(key, p);
+					// Use Put instead of Add, since 'o' is of unknown type
+					ret.Put(key, o); // Copy of all other types
 				}
 			}
 
-			return this;
+			return ret;
 		}
+		#endregion
 
+		#region IEquatable<Parameters> Members
 		/// <summary>
-		/// TODO
+		/// Indicates whether the current object is equal to another object of this type.
 		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <returns></returns>
-		public static bool IsEqual(Parameters a, Parameters b)
+		/// <param name="other">An object to compare with this object.</param>
+		/// <returns><b>true</b> if the current object is equal to the other parameter; otherwise, <b>false</b>.</returns>
+		public bool Equals(Parameters other)
 		{
-			if(a.Count!=b.Count) return false;
+			if (Count != other.Count) return false;
 
-			foreach(string key in a.items.Keys)
+			foreach (string key in items.Keys)
 			{
-				if(!b.Contains(key)) return false;
+				if (!other.Contains(key)) return false;
 
-				object oa=a.items[key];
-				object ob=b.items[key];
+				object oa = items[key];
+				object ob = other.items[key];
 
-				if(oa is bool)
+				if (oa is bool)
 				{
-					if(!(ob is bool)) return false;
-					if((bool)oa!=(bool)ob) return false;
+					if (!(ob is bool)) return false;
+					if ((bool)oa != (bool)ob) return false;
 				}
-				else if(oa is long)
+				else if (oa is long)
 				{
-					if(!(ob is long)) return false;
-					if((long)oa!=(long)ob) return false;
+					if (!(ob is long)) return false;
+					if ((long)oa != (long)ob) return false;
 				}
-				else if(oa is double)
+				else if (oa is double)
 				{
-					if(!(ob is double)) return false;
-					if((double)oa!=(double)ob) return false;
+					if (!(ob is double)) return false;
+					if ((double)oa != (double)ob) return false;
 				}
-				else if(oa is string)
+				else if (oa is string)
 				{
-					if(!(ob is string)) return false;
-					if((string)oa!=(string)ob) return false;
+					if (!(ob is string)) return false;
+					if ((string)oa != (string)ob) return false;
 				}
-				else if(oa is Parameters)
+				else if (oa is Parameters)
 				{
-					if(!(ob is Parameters)) return false;
-					if(!IsEqual((Parameters)oa, (Parameters)ob)) return false;
+					if (!(ob is Parameters)) return false;
+					if (!((Parameters)oa).Equals((Parameters)ob)) return false;
 				}
-				else if(oa is IList)
+				else if (oa is IList)
 				{
-					if(!(ob is IList)) return false;
+					if (!(ob is IList)) return false;
 
-					IList la=oa as IList;
-					IList lb=ob as IList;
+					IList la = oa as IList;
+					IList lb = ob as IList;
 
-					if(la.Count!=lb.Count) return false;
+					if (la.Count != lb.Count) return false;
 
-					if(oa is List<bool>)
+					if (oa is List<bool>)
 					{
-						if(!(ob is List<bool>)) return false;
+						if (!(ob is List<bool>)) return false;
 
-						List<bool> ia=oa as List<bool>;
-						List<bool> ib=ob as List<bool>;
+						List<bool> ia = oa as List<bool>;
+						List<bool> ib = ob as List<bool>;
 
-						for(int i=0; i<ia.Count; i++)
-							if(ia[i]!=ib[i]) return false;
+						for (int i = 0; i < ia.Count; i++)
+							if (ia[i] != ib[i]) return false;
 					}
-					else if(oa is List<long>)
+					else if (oa is List<long>)
 					{
-						if(!(ob is List<long>)) return false;
+						if (!(ob is List<long>)) return false;
 
-						List<long> ia=oa as List<long>;
-						List<long> ib=ob as List<long>;
+						List<long> ia = oa as List<long>;
+						List<long> ib = ob as List<long>;
 
-						for(int i=0; i<ia.Count; i++)
-							if(ia[i]!=ib[i]) return false;
+						for (int i = 0; i < ia.Count; i++)
+							if (ia[i] != ib[i]) return false;
 					}
-					else if(oa is List<double>)
+					else if (oa is List<double>)
 					{
-						if(!(ob is List<double>)) return false;
+						if (!(ob is List<double>)) return false;
 
-						List<double> ia=oa as List<double>;
-						List<double> ib=ob as List<double>;
+						List<double> ia = oa as List<double>;
+						List<double> ib = ob as List<double>;
 
-						for(int i=0; i<ia.Count; i++)
-							if(ia[i]!=ib[i]) return false;
+						for (int i = 0; i < ia.Count; i++)
+							if (ia[i] != ib[i]) return false;
 					}
-					else if(oa is List<string>)
+					else if (oa is List<string>)
 					{
-						if(!(ob is List<string>)) return false;
+						if (!(ob is List<string>)) return false;
 
-						List<string> ia=oa as List<string>;
-						List<string> ib=ob as List<string>;
+						List<string> ia = oa as List<string>;
+						List<string> ib = ob as List<string>;
 
-						for(int i=0; i<ia.Count; i++)
-							if(ia[i]!=ib[i]) return false;
+						for (int i = 0; i < ia.Count; i++)
+							if (ia[i] != ib[i]) return false;
 					}
-					else if(oa is List<Parameters>)
+					else if (oa is List<Parameters>)
 					{
-						if(!(ob is List<Parameters>)) return false;
+						if (!(ob is List<Parameters>)) return false;
 
-						List<Parameters> ia=oa as List<Parameters>;
-						List<Parameters> ib=ob as List<Parameters>;
+						List<Parameters> ia = oa as List<Parameters>;
+						List<Parameters> ib = ob as List<Parameters>;
 
-						for(int i=0; i<ia.Count; i++)
-							if(!IsEqual(ia[i], ib[i])) return false;
+						for (int i = 0; i < ia.Count; i++)
+							if (!ia[i].Equals(ib[i])) return false;
 					}
 				}
-				else if(oa is byte[])
+				else if (oa is byte[])
 				{
-					if(!(ob is byte[])) return false;
+					if (!(ob is byte[])) return false;
 
-					byte[] ia=oa as byte[];
-					byte[] ib=ob as byte[];
+					byte[] ia = oa as byte[];
+					byte[] ib = ob as byte[];
 
-					for(int i=0; i<ia.Length; i++)
-						if(ia[i]!=ib[i]) return false;
+					for (int i = 0; i < ia.Length; i++)
+						if (ia[i] != ib[i]) return false;
 				}
 				else return false;
 			}
 
 			return true;
 		}
+		#endregion
 
+		#region IEnumerable Members
 		/// <summary>
-		/// TODO
+		/// Returns an enumerator that iterates through a collection.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>An <see cref="IEnumerator"/> object that can be used to iterate through the collection.</returns>
 		public IEnumerator GetEnumerator()
 		{
 			return items.GetEnumerator();
-		}
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public IEnumerable<string> Keys { get { return items.Keys; } }
-
-		#region Command line
-		/// <summary>
-		/// Converts args into Parameters -verbose -InFile:C:\hfjkhd.txt -OutFile:c:\dfsfk.out
-		/// </summary>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		public static Parameters InterpretCommandLine(string[] args)
-		{
-			Parameters ret=new Parameters();
-			if (args.Length<1) return ret;
-
-			int filecount=0;
-			string key;
-			foreach (string str in args)
-			{
-				if (str[0]=='-')
-				{
-					int idx=str.IndexOf(':');
-					if (idx>=0)
-					{
-						key=str.Substring(1, idx-1);
-						if (key!="") ret.Add(key, str.Substring(idx+1));
-					}
-					else
-					{
-						key=str.Substring(1);
-						if (key!="") ret.Add(key, true);
-					}
-				}
-				else
-				{
-					key=String.Format("file{0:000}", filecount++);
-					ret.Add(key, str);
-				}
-			}
-			return ret;
-		}
-
-		/// <summary>
-		/// Retrieves all values, that begins with "file".
-		/// </summary>
-		/// <returns></returns>
-		public List<string> GetFilesFromParameters()
-		{
-			List<string> ret=new List<string>();
-
-			foreach(string i in GetNames())
-			{
-				if(i.StartsWith("file"))
-				{
-					ret.Add(GetString(i));
-				}
-			}
-
-			return ret;
 		}
 		#endregion
 	}
