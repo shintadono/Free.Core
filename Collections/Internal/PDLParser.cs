@@ -539,7 +539,7 @@ namespace Free.Core.Collections.Internal
 					if (stream.EndOfStream) throw new TextParserException("Unexpected end of stream while parsing a string.", line);
 
 					char a = (char)stream.Read();
-					if (a != '\\' && a != '"') throw new TextParserException("Invalid character while parsing  a string.", line);
+					if (a != '\\' && a != '"') throw new TextParserException("Invalid character while parsing a string.", line);
 					c = a;
 				}
 

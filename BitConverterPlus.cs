@@ -2479,7 +2479,7 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
-		/// <returns>The array of  double-precision floating point numbers.</returns>
+		/// <returns>The array of double-precision floating point numbers.</returns>
 		public static unsafe double[] ToDoubleArraySwapped(byte[] value, int index=0, int count=0)
 		{
 			if(value==null) throw new ArgumentNullException("value");
