@@ -52,6 +52,7 @@
     <Compile Include="Collections\Bitfield.cs" />
     <Compile Include="BitOrder.cs" />
     <Compile Include="Bits.cs" />
+    <Compile Include="Collections\Generic\ResourceRecycler.cs" />
     <Compile Include="Collections\Internal\PDLParser.cs" />
     <Compile Include="Collections\Internal\ParametersToPDLConverter.cs" />
     <Compile Include="Exceptions\TextParserException.cs" />
