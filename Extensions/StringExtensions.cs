@@ -75,14 +75,8 @@ namespace Free.Core.Extensions.StringExtensions
 		/// <returns><b>true</b> if the <b>string</b> is an integer; otherwise, <b>false</b>.</returns>
 		public static bool IsInteger(this string number)
 		{
-			if (string.IsNullOrWhiteSpace(number)) return false;
-
-			// Handle sign
-			if (number[0] == '+' || number[0] == '-') // Integer only
-				return number.Substring(1).IsIntegerWithoutSign();
-
-			// No sign
-			return number.IsIntegerWithoutSign();
+			int dummy = 0;
+            		return Int32.TryParse(number, out dummy);
 		}
 
 		/// <summary>
@@ -108,13 +102,8 @@ namespace Free.Core.Extensions.StringExtensions
 		/// <returns><b>true</b> if the <b>string</b> is a floating-point number; otherwise, <b>false</b>.</returns>
 		public static bool IsFloat(this string number)
 		{
-			if (string.IsNullOrWhiteSpace(number)) return false;
-
-			// Handle sign
-			if (number[0] == '-') return number.Substring(1).IsFloatWithoutSign();
-
-			// No sign
-			return number.IsFloatWithoutSign();
+			double dummy = 0;
+            		return Double.TryParse(number, out dummy);
 		}
 
 		/// <summary>
