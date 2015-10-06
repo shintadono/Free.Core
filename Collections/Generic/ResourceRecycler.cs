@@ -8,7 +8,7 @@ namespace Free.Core.Collections.Generic
 	/// </summary>
 	/// <typeparam name="K">The type for the key. Must be a class! (<b>null</b> signals unsed resources.)</typeparam>
 	/// <typeparam name="T">The type for the resources.</typeparam>
-	class ResourceRecycler<K, T> where K : class
+	public class ResourceRecycler<K, T> where K : class
 	{
 		/// <summary>
 		/// The cache tile informations.
