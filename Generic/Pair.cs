@@ -12,12 +12,12 @@ namespace Free.Core.Generic
 		/// <summary>
 		/// The first element of the pair.
 		/// </summary>
-		public T First;
+		public T First {get; set;}
 
 		/// <summary>
 		/// The second element of the pair.
 		/// </summary>
-		public T Second;
+		public T Second {get; set;}
 
 		/// <summary>
 		/// Creates a pair.
@@ -37,9 +37,14 @@ namespace Free.Core.Generic
 		/// <returns></returns>
 		public override bool Equals(object obj)
 		{
-			if(obj==null) return false;
-			Pair<T> o=(Pair<T>)obj;
-			return First.Equals(o.First)&&Second.Equals(o.Second);
+			if(obj is Pair<T>)
+			{
+				return First.Equals((obj as Pair<T>).First) && Second.Equals((obj as Pair<T>).Second);	
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		/// <summary>
