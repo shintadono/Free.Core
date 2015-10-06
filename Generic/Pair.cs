@@ -3,9 +3,9 @@
 namespace Free.Core.Generic
 {
 	/// <summary>
-	/// TODO
+	/// A tuple of 2 elements of the same type.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">Type of the elements.</typeparam>
 	[DebuggerDisplay("Pair = {First} => {Second}")]
 	public class Pair<T>
 	{
@@ -31,21 +31,21 @@ namespace Free.Core.Generic
 		}
 
 		/// <summary>
-		/// 
+		/// Determines whether the specified object is equal to the current instance.
 		/// </summary>
-		/// <param name="obj"></param>
-		/// <returns></returns>
+		/// <param name="obj">The object to compare with the current instance.</param>
+		/// <returns><b>true</b> if the specified object is equal to the current instance; otherwise, <b>false</b>.</returns>
 		public override bool Equals(object obj)
 		{
-			if(obj==null) return false;
-			Pair<T> o=(Pair<T>)obj;
-			return First.Equals(o.First)&&Second.Equals(o.Second);
+			Pair<T> o = obj as Pair<T>;
+			if (o == null) return false;
+			return First.Equals(o.First) && Second.Equals(o.Second);
 		}
 
 		/// <summary>
-		/// 
+		/// Get a hash code for the current instance.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>A hash code for the current instance.</returns>
 		public override int GetHashCode()
 		{
 			if((object)First==null)
