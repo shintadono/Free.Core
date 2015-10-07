@@ -111,7 +111,6 @@ namespace Free.Core.Collections.Generic
 		public bool ContainsKey(K key)
 		{
 			if (key == null) throw new ArgumentNullException("key");
-
 			return dict.ContainsKey(key);
 		}
 
@@ -206,7 +205,7 @@ namespace Free.Core.Collections.Generic
 				Head = entry;
 			}
 
-			dict.Remove(Head.Key);
+			if(Head.Key!=null) dict.Remove(Head.Key);
 
 			Head.Key = newKey;
 
