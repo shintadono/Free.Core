@@ -165,6 +165,7 @@ namespace Free.Core.Collections.Generic
 			// Remove entry.
 			entry.Previous.Next = entry.Next;
 			if (entry.Next != null) entry.Next.Previous = entry.Previous;
+			else Tail = entry.Previous; // Don't forget to update Tail when entry is the tail.
 
 			// Prepare new head.
 			entry.Next = Head;
@@ -192,16 +193,17 @@ namespace Free.Core.Collections.Generic
 
 			if (Tail != Head)
 			{
-				// Move Tail to Head
+				// Move Tail up the chain and remember old Tail (the entry to recycle).
 				Entry entry = Tail;
-
 				Tail = Tail.Previous;
 				Tail.Next = null;
 
+				// Connect entry to the (soon to be old) Head.
 				entry.Previous = null;
 				entry.Next = Head;
-
 				Head.Previous = entry;
+
+				// Make entry the new Head.
 				Head = entry;
 			}
 
