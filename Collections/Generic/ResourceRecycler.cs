@@ -83,6 +83,21 @@ namespace Free.Core.Collections.Generic
 		}
 
 		/// <summary>
+		/// Clears the cache by resetting all keys. The resources stay.
+		/// </summary>
+		public void ClearKeys()
+		{
+			dict.Clear();
+
+			Entry h = Head;
+			while (h != null)
+			{
+				h.Key = default(K);
+				h = h.Next;
+			}
+		}
+
+		/// <summary>
 		/// Fills the instance with entries from given resources. All previous managed resources will be removed.
 		/// </summary>
 		/// <param name="resources">The resources to initialise the cache with.</param>
