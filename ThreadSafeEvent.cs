@@ -3,12 +3,12 @@
 namespace Free.Core
 {
 	/// <summary>
-	/// TODO
+	/// Describes a thread safe event.
 	/// </summary>
-	public class ThreadSafeEvent
+	public class ThreadSafeEvent : IDisposable
 	{
 		EventHandler internalEventHandler;
-		readonly object internalEventHandlerLock=new object();
+		readonly object internalEventHandlerLock = new object();
 
 		/// <summary>
 		/// Encapsulates the event.
@@ -17,16 +17,16 @@ namespace Free.Core
 		{
 			add
 			{
-				lock(internalEventHandlerLock)
+				lock (internalEventHandlerLock)
 				{
-					internalEventHandler+=value;
+					internalEventHandler += value;
 				}
 			}
 			remove
 			{
-				lock(internalEventHandlerLock)
+				lock (internalEventHandlerLock)
 				{
-					internalEventHandler-=value;
+					internalEventHandler -= value;
 				}
 			}
 		}
@@ -37,25 +37,41 @@ namespace Free.Core
 		public virtual void Fire(object sender, EventArgs e)
 		{
 			EventHandler handler;
-			lock(internalEventHandlerLock)
+			lock (internalEventHandlerLock)
 			{
-				handler=internalEventHandler;
+				handler = internalEventHandler;
 			}
-			if(handler!=null)
+			if (handler != null)
 			{
 				handler(sender, e);
 			}
 		}
+
+		/// <summary>
+		/// Removes all event handler from the event.
+		/// </summary>
+		public void RemoveAll()
+		{
+			lock (internalEventHandlerLock)
+			{
+				internalEventHandler = null;
+			}
+		}
+
+		void IDisposable.Dispose()
+		{
+			RemoveAll();
+		}
 	}
 
 	/// <summary>
-	/// TODO
+	/// Describes a generic thread safe event.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">Must be <see cref="EventArgs"/> or based on it.</typeparam>
 	public sealed class ThreadSafeEvent<T> : IDisposable where T : EventArgs
 	{
 		EventHandler<T> internalEventHandler;
-		readonly object internalEventHandlerLock=new object();
+		readonly object internalEventHandlerLock = new object();
 
 		/// <summary>
 		/// Encapsulates the event.
@@ -64,16 +80,16 @@ namespace Free.Core
 		{
 			add
 			{
-				lock(internalEventHandlerLock)
+				lock (internalEventHandlerLock)
 				{
-					internalEventHandler+=value;
+					internalEventHandler += value;
 				}
 			}
 			remove
 			{
-				lock(internalEventHandlerLock)
+				lock (internalEventHandlerLock)
 				{
-					internalEventHandler-=value;
+					internalEventHandler -= value;
 				}
 			}
 		}
@@ -84,32 +100,29 @@ namespace Free.Core
 		public void Fire(object sender, T e)
 		{
 			EventHandler<T> handler;
-			lock(internalEventHandlerLock)
+			lock (internalEventHandlerLock)
 			{
-				handler=internalEventHandler;
+				handler = internalEventHandler;
 			}
 
-			if(handler!=null)
+			if (handler != null)
 			{
 				handler(sender, e);
 			}
 		}
 
 		/// <summary>
-		/// TODO
+		/// Removes all event handler from the event.
 		/// </summary>
 		public void RemoveAll()
 		{
-			lock(internalEventHandlerLock)
+			lock (internalEventHandlerLock)
 			{
-				internalEventHandler=null;
+				internalEventHandler = null;
 			}
 		}
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public void Dispose()
+		void IDisposable.Dispose()
 		{
 			RemoveAll();
 		}
