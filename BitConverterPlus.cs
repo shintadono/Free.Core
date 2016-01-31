@@ -10,20 +10,42 @@ namespace Free.Core
 	{
 		#region IsLittleEndian
 		/// <summary>
-		/// Helper, used to check byte-order and to initialize <see cref="IsLittleEndian"/>.
+		/// Helper, used to check byte-order for integer numbers and to initialize <see cref="IsLittleEndian"/>.
 		/// </summary>
 		/// <returns><c>true</c> for little-endian. <c>false</c> for big-endian.</returns>
 		static unsafe bool GetIsLittleEndian()
 		{
-			ushort us=0xFF00;
-			byte* b=(byte*)&us;
-			return b[0]==0;
+			ushort us = 0xFF00;
+			byte* b = (byte*)&us;
+			return b[0] == 0;
 		}
 
 		/// <summary>
-		/// Indicates the byte-order used in this computer architecture.
+		/// Indicates the byte-order (for integer numbers) used in this computer architecture.
 		/// </summary>
-		public static readonly bool IsLittleEndian=GetIsLittleEndian();
+		public static readonly bool IsLittleEndian = GetIsLittleEndian();
+
+		/// <summary>
+		/// Helper, used to check byte-order for floating-point numbers and to initialize <see cref="IsDoubleLittleEndian"/>.
+		/// </summary>
+		/// <returns><c>true</c> for little-endian. <c>false</c> for big-endian.</returns>
+		static unsafe bool GetIsDoubleLittleEndian()
+		{
+			double d = 1.0;
+			byte* b = (byte*)&d;
+
+			// If this doesn't work, either the compiler is broke or we're running on a very odd platform.
+			if (b[7] == 0x3F && b[6] == 0xF0 && b[5] == 0 && b[4] == 0 && b[3] == 0 && b[2] == 0 && b[1] == 0 && b[0] == 0) return true;
+			if (b[0] == 0x3F && b[1] == 0xF0 && b[2] == 0 && b[3] == 0 && b[4] == 0 && b[5] == 0 && b[6] == 0 && b[7] == 0) return false;
+
+			// It may be better to throw an ArithmeticException or a PlatformNotSupportedException here.
+			return IsLittleEndian;
+		}
+
+		/// <summary>
+		/// Indicates the byte-order (for floating-point numbers) used in this computer architecture.
+		/// </summary>
+		public static readonly bool IsDoubleLittleEndian = GetIsDoubleLittleEndian();
 		#endregion
 
 		#region GetBytes
@@ -34,7 +56,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 1.</returns>
 		public static byte[] GetBytes(bool value)
 		{
-			return new byte[1] { value?(byte)1:(byte)0 };
+			return new byte[1] { value ? (byte)1 : (byte)0 };
 		}
 
 		/// <summary>
@@ -44,7 +66,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2.</returns>
 		public static unsafe byte[] GetBytes(char value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[0], ptr[1] };
 		}
 
@@ -55,7 +77,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2.</returns>
 		public static unsafe byte[] GetBytes(short value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[0], ptr[1] };
 		}
 
@@ -67,7 +89,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytes(ushort value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[0], ptr[1] };
 		}
 
@@ -78,7 +100,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4.</returns>
 		public static unsafe byte[] GetBytes(int value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[0], ptr[1], ptr[2], ptr[3] };
 		}
 
@@ -90,7 +112,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytes(uint value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[0], ptr[1], ptr[2], ptr[3] };
 		}
 
@@ -101,7 +123,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8.</returns>
 		public static unsafe byte[] GetBytes(long value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7] };
 		}
 
@@ -113,7 +135,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytes(ulong value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7] };
 		}
 
@@ -125,8 +147,8 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytes(UInt128 value)
 		{
-			byte* ptrHigh=(byte*)&value.High;
-			byte* ptrLow=(byte*)&value.Low;
+			byte* ptrHigh = (byte*)&value.High;
+			byte* ptrLow = (byte*)&value.Low;
 			return new byte[16] {
 				ptrLow[0], ptrLow[1], ptrLow[2], ptrLow[3], ptrLow[4], ptrLow[5], ptrLow[6], ptrLow[7],
 				ptrHigh[0], ptrHigh[1], ptrHigh[2], ptrHigh[3], ptrHigh[4], ptrHigh[5], ptrHigh[6], ptrHigh[7]};
@@ -139,7 +161,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4.</returns>
 		public static unsafe byte[] GetBytes(float value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[0], ptr[1], ptr[2], ptr[3] };
 		}
 
@@ -150,7 +172,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8.</returns>
 		public static unsafe byte[] GetBytes(double value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7] };
 		}
 		#endregion
@@ -163,7 +185,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 1 in reversed byte-order to this computer architecture.</returns>
 		public static byte[] GetBytesSwapped(bool value)
 		{
-			return new byte[1] { value?(byte)1:(byte)0 };
+			return new byte[1] { value ? (byte)1 : (byte)0 };
 		}
 
 		/// <summary>
@@ -173,7 +195,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(char value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[1], ptr[0] };
 		}
 
@@ -184,7 +206,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(short value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[1], ptr[0] };
 		}
 
@@ -196,7 +218,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytesSwapped(ushort value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[2] { ptr[1], ptr[0] };
 		}
 
@@ -207,7 +229,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(int value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 
@@ -219,7 +241,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytesSwapped(uint value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 
@@ -230,7 +252,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(long value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[7], ptr[6], ptr[5], ptr[4], ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 
@@ -242,7 +264,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytesSwapped(ulong value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[7], ptr[6], ptr[5], ptr[4], ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 
@@ -254,8 +276,8 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static unsafe byte[] GetBytesSwapped(UInt128 value)
 		{
-			byte* ptrHigh=(byte*)&value.High;
-			byte* ptrLow=(byte*)&value.Low;
+			byte* ptrHigh = (byte*)&value.High;
+			byte* ptrLow = (byte*)&value.Low;
 			return new byte[16] {
 				ptrHigh[7], ptrHigh[6], ptrHigh[5], ptrHigh[4], ptrHigh[3], ptrHigh[2], ptrHigh[1], ptrHigh[0],
 				ptrLow[7], ptrLow[6], ptrLow[5], ptrLow[4], ptrLow[3], ptrLow[2], ptrLow[1], ptrLow[0] };
@@ -268,7 +290,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(float value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[4] { ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 
@@ -279,7 +301,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8 in reversed byte-order to this computer architecture.</returns>
 		public static unsafe byte[] GetBytesSwapped(double value)
 		{
-			byte* ptr=(byte*)&value;
+			byte* ptr = (byte*)&value;
 			return new byte[8] { ptr[7], ptr[6], ptr[5], ptr[4], ptr[3], ptr[2], ptr[1], ptr[0] };
 		}
 		#endregion
@@ -293,7 +315,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 1 in the given byte-order.</returns>
 		public static byte[] GetBytes(bool value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -304,7 +326,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2 in the given byte-order.</returns>
 		public static byte[] GetBytes(char value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -315,7 +337,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 2 in the given byte-order.</returns>
 		public static byte[] GetBytes(short value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -327,7 +349,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static byte[] GetBytes(ushort value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -338,7 +360,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4 in the given byte-order.</returns>
 		public static byte[] GetBytes(int value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -350,7 +372,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static byte[] GetBytes(uint value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -361,7 +383,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8 in the given byte-order.</returns>
 		public static byte[] GetBytes(long value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -373,7 +395,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static byte[] GetBytes(ulong value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -385,7 +407,7 @@ namespace Free.Core
 		[CLSCompliant(false)]
 		public static byte[] GetBytes(UInt128 value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -396,7 +418,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 4 in the given byte-order.</returns>
 		public static byte[] GetBytes(float value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsDoubleLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 
 		/// <summary>
@@ -407,7 +429,7 @@ namespace Free.Core
 		/// <returns>An array of bytes with length 8 in the given byte-order.</returns>
 		public static byte[] GetBytes(double value, bool bigEndian)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value):GetBytesSwapped(value);
+			return IsDoubleLittleEndian ^ bigEndian ? GetBytes(value) : GetBytesSwapped(value);
 		}
 		#endregion
 
@@ -418,14 +440,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns><c>true</c> if the byte at <paramref name="index"/> in <paramref name="value"/> is nonzero; otherwise <c>false</c>.</returns>
-		public static bool ToBoolean(byte[] value, int index=0)
+		public static bool ToBoolean(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>=value.Length)
+			if (index < 0 || index >= value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value.");
 
-			return value[index]!=0;
+			return value[index] != 0;
 		}
 
 		/// <summary>
@@ -434,14 +456,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A character formed by two bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe char ToChar(byte[] value, int index=0)
+		public static unsafe char ToChar(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			fixed(byte* ptr=&value[index]) return *(char*)ptr;
+			fixed (byte* ptr = &value[index]) return *(char*)ptr;
 		}
 
 		/// <summary>
@@ -450,14 +472,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit signed integer formed by two bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe short ToInt16(byte[] value, int index=0)
+		public static unsafe short ToInt16(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			fixed(byte* ptr=&value[index]) return *(short*)ptr;
+			fixed (byte* ptr = &value[index]) return *(short*)ptr;
 		}
 
 		/// <summary>
@@ -467,14 +489,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit unsigned integer formed by two bytes beginning at <paramref name="index"/>.</returns>
 		[CLSCompliant(false)]
-		public static unsafe ushort ToUInt16(byte[] value, int index=0)
+		public static unsafe ushort ToUInt16(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			fixed(byte* ptr=&value[index]) return *(ushort*)ptr;
+			fixed (byte* ptr = &value[index]) return *(ushort*)ptr;
 		}
 
 		/// <summary>
@@ -483,14 +505,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit signed integer formed by four bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe int ToInt32(byte[] value, int index=0)
+		public static unsafe int ToInt32(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
-			fixed(byte* ptr=&value[index]) return *(int*)ptr;
+			fixed (byte* ptr = &value[index]) return *(int*)ptr;
 		}
 
 		/// <summary>
@@ -500,14 +522,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit unsigned integer formed by four bytes beginning at <paramref name="index"/>.</returns>
 		[CLSCompliant(false)]
-		public static unsafe uint ToUInt32(byte[] value, int index=0)
+		public static unsafe uint ToUInt32(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
-			fixed(byte* ptr=&value[index]) return *(uint*)ptr;
+			fixed (byte* ptr = &value[index]) return *(uint*)ptr;
 		}
 
 		/// <summary>
@@ -516,14 +538,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit signed integer formed by eight bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe long ToInt64(byte[] value, int index=0)
+		public static unsafe long ToInt64(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
-			fixed(byte* ptr=&value[index]) return *(long*)ptr;
+			fixed (byte* ptr = &value[index]) return *(long*)ptr;
 		}
 
 		/// <summary>
@@ -533,14 +555,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit unsigned integer formed by eight bytes beginning at <paramref name="index"/>.</returns>
 		[CLSCompliant(false)]
-		public static unsafe ulong ToUInt64(byte[] value, int index=0)
+		public static unsafe ulong ToUInt64(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
-			fixed(byte* ptr=&value[index]) return *(ulong*)ptr;
+			fixed (byte* ptr = &value[index]) return *(ulong*)ptr;
 		}
 
 		/// <summary>
@@ -550,14 +572,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 128-bit unsigned integer formed by sixteen bytes beginning at <paramref name="index"/>.</returns>
 		[CLSCompliant(false)]
-		public static unsafe UInt128 ToUInt128(byte[] value, int index=0)
+		public static unsafe UInt128 ToUInt128(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+16>value.Length)
+			if (index < 0 || index + 16 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 15.");
 
-			fixed(byte* ptr=&value[index]) return new UInt128(*(ulong*)(ptr+8), *(ulong*)ptr);
+			fixed (byte* ptr = &value[index]) return new UInt128(*(ulong*)(ptr + 8), *(ulong*)ptr);
 		}
 
 		/// <summary>
@@ -566,14 +588,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A single-precision floating point number formed by four bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe float ToSingle(byte[] value, int index=0)
+		public static unsafe float ToSingle(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
-			fixed(byte* ptr=&value[index]) return *(float*)ptr;
+			fixed (byte* ptr = &value[index]) return *(float*)ptr;
 		}
 
 		/// <summary>
@@ -582,14 +604,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A double-precision floating point number formed by eight bytes beginning at <paramref name="index"/>.</returns>
-		public static unsafe double ToDouble(byte[] value, int index=0)
+		public static unsafe double ToDouble(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
-			fixed(byte* ptr=&value[index]) return *(double*)ptr;
+			fixed (byte* ptr = &value[index]) return *(double*)ptr;
 		}
 		#endregion
 
@@ -600,14 +622,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns><c>true</c> if the byte at <paramref name="index"/> in <paramref name="value"/> is nonzero; otherwise <c>false</c>.</returns>
-		public static bool ToBooleanSwapped(byte[] value, int index=0)
+		public static bool ToBooleanSwapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>=value.Length)
+			if (index < 0 || index >= value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value.");
 
-			return value[index]!=0;
+			return value[index] != 0;
 		}
 
 		/// <summary>
@@ -616,14 +638,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A character formed by two bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static char ToCharSwapped(byte[] value, int index=0)
+		public static char ToCharSwapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			return (char)(value[index]<<8|value[index+1]);
+			return (char)(value[index] << 8 | value[index + 1]);
 		}
 
 		/// <summary>
@@ -632,14 +654,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit signed integer formed by two bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static short ToInt16Swapped(byte[] value, int index=0)
+		public static short ToInt16Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			return (short)(value[index]<<8|value[index+1]);
+			return (short)(value[index] << 8 | value[index + 1]);
 		}
 
 		/// <summary>
@@ -649,14 +671,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit unsigned integer formed by two bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static ushort ToUInt16Swapped(byte[] value, int index=0)
+		public static ushort ToUInt16Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+2>value.Length)
+			if (index < 0 || index + 2 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 1.");
 
-			return (ushort)(value[index]<<8|value[index+1]);
+			return (ushort)(value[index] << 8 | value[index + 1]);
 		}
 
 		/// <summary>
@@ -665,14 +687,14 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit signed integer formed by four bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static int ToInt32Swapped(byte[] value, int index=0)
+		public static int ToInt32Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
-			return value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3];
+			return value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3];
 		}
 
 		/// <summary>
@@ -682,14 +704,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit unsigned integer formed by four bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static uint ToUInt32Swapped(byte[] value, int index=0)
+		public static uint ToUInt32Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
-			return (uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
+			return (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
 		}
 
 		/// <summary>
@@ -698,16 +720,16 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit signed integer formed by eight bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static long ToInt64Swapped(byte[] value, int index=0)
+		public static long ToInt64Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
-			uint a=(uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
-			uint b=(uint)(value[index+4]<<24|value[index+5]<<16|value[index+6]<<8|value[index+7]);
-			return (long)a<<32|b;
+			uint a = (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
+			uint b = (uint)(value[index + 4] << 24 | value[index + 5] << 16 | value[index + 6] << 8 | value[index + 7]);
+			return (long)a << 32 | b;
 		}
 
 		/// <summary>
@@ -717,16 +739,16 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit unsigned integer formed by eight bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static ulong ToUInt64Swapped(byte[] value, int index=0)
+		public static ulong ToUInt64Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
-			uint a=(uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
-			uint b=(uint)(value[index+4]<<24|value[index+5]<<16|value[index+6]<<8|value[index+7]);
-			return (ulong)a<<32|b;
+			uint a = (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
+			uint b = (uint)(value[index + 4] << 24 | value[index + 5] << 16 | value[index + 6] << 8 | value[index + 7]);
+			return (ulong)a << 32 | b;
 		}
 
 		/// <summary>
@@ -736,14 +758,14 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 128-bit unsigned integer formed by sixteen bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static UInt128 ToUInt128Swapped(byte[] value, int index=0)
+		public static UInt128 ToUInt128Swapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+16>value.Length)
+			if (index < 0 || index + 16 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 15.");
 
-			return new UInt128(ToUInt64Swapped(value, index), ToUInt64Swapped(value, index+8));
+			return new UInt128(ToUInt64Swapped(value, index), ToUInt64Swapped(value, index + 8));
 		}
 
 		/// <summary>
@@ -752,18 +774,18 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A single-precision floating point number formed by four bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static unsafe float ToSingleSwapped(byte[] value, int index=0)
+		public static unsafe float ToSingleSwapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+4>value.Length)
+			if (index < 0 || index + 4 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 3.");
 
 			float ret;
-			fixed(byte* pValue=&value[index])
+			fixed (byte* pValue = &value[index])
 			{
-				int v=*(int*)pValue;
-				*(int*)&ret=v<<24|(v&0xff00)<<8|(v>>8&0xff00)|(v>>24&0xff);
+				int v = *(int*)pValue;
+				*(int*)&ret = v << 24 | (v & 0xff00) << 8 | (v >> 8 & 0xff00) | (v >> 24 & 0xff);
 			}
 			return ret;
 		}
@@ -774,25 +796,25 @@ namespace Free.Core
 		/// <param name="value">An array of bytes.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A double-precision floating point number formed by eight bytes beginning at <paramref name="index"/> in reversed byte-order to this computer architecture.</returns>
-		public static unsafe double ToDoubleSwapped(byte[] value, int index=0)
+		public static unsafe double ToDoubleSwapped(byte[] value, int index = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index+8>value.Length)
+			if (index < 0 || index + 8 > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value minus 7.");
 
 			double ret;
-			byte* pRet=(byte*)&ret;
-			fixed(byte* pValue=&value[index])
+			byte* pRet = (byte*)&ret;
+			fixed (byte* pValue = &value[index])
 			{
-				pRet[0]=pValue[7];
-				pRet[1]=pValue[6];
-				pRet[2]=pValue[5];
-				pRet[3]=pValue[4];
-				pRet[4]=pValue[3];
-				pRet[5]=pValue[2];
-				pRet[6]=pValue[1];
-				pRet[7]=pValue[0];
+				pRet[0] = pValue[7];
+				pRet[1] = pValue[6];
+				pRet[2] = pValue[5];
+				pRet[3] = pValue[4];
+				pRet[4] = pValue[3];
+				pRet[5] = pValue[2];
+				pRet[6] = pValue[1];
+				pRet[7] = pValue[0];
 			}
 			return ret;
 		}
@@ -806,9 +828,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns><c>true</c> if the byte at <paramref name="index"/> in <paramref name="value"/> is nonzero; otherwise <c>false</c>.</returns>
-		public static bool ToBoolean(byte[] value, bool bigEndian, int index=0)
+		public static bool ToBoolean(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToBoolean(value, index):ToBooleanSwapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToBoolean(value, index) : ToBooleanSwapped(value, index);
 		}
 
 		/// <summary>
@@ -818,9 +840,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A character formed by two bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static char ToChar(byte[] value, bool bigEndian, int index=0)
+		public static char ToChar(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToChar(value, index):ToCharSwapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToChar(value, index) : ToCharSwapped(value, index);
 		}
 
 		/// <summary>
@@ -830,9 +852,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit signed integer formed by two bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static short ToInt16(byte[] value, bool bigEndian, int index=0)
+		public static short ToInt16(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt16(value, index):ToInt16Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToInt16(value, index) : ToInt16Swapped(value, index);
 		}
 
 		/// <summary>
@@ -843,9 +865,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 16-bit unsigned integer formed by two bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static ushort ToUInt16(byte[] value, bool bigEndian, int index=0)
+		public static ushort ToUInt16(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt16(value, index):ToUInt16Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToUInt16(value, index) : ToUInt16Swapped(value, index);
 		}
 
 		/// <summary>
@@ -855,9 +877,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit signed integer formed by four bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static int ToInt32(byte[] value, bool bigEndian, int index=0)
+		public static int ToInt32(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt32(value, index):ToInt32Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToInt32(value, index) : ToInt32Swapped(value, index);
 		}
 
 		/// <summary>
@@ -868,9 +890,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 32-bit unsigned integer formed by four bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static uint ToUInt32(byte[] value, bool bigEndian, int index=0)
+		public static uint ToUInt32(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt32(value, index):ToUInt32Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToUInt32(value, index) : ToUInt32Swapped(value, index);
 		}
 
 		/// <summary>
@@ -880,9 +902,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit signed integer formed by eight bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static long ToInt64(byte[] value, bool bigEndian, int index=0)
+		public static long ToInt64(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt64(value, index):ToInt64Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToInt64(value, index) : ToInt64Swapped(value, index);
 		}
 
 		/// <summary>
@@ -893,9 +915,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 64-bit unsigned integer formed by eight bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static ulong ToUInt64(byte[] value, bool bigEndian, int index=0)
+		public static ulong ToUInt64(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt64(value, index):ToUInt64Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToUInt64(value, index) : ToUInt64Swapped(value, index);
 		}
 
 		/// <summary>
@@ -906,9 +928,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A 128-bit unsigned integer formed by sixteen bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static UInt128 ToUInt128(byte[] value, bool bigEndian, int index=0)
+		public static UInt128 ToUInt128(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt128(value, index):ToUInt128Swapped(value, index);
+			return IsLittleEndian ^ bigEndian ? ToUInt128(value, index) : ToUInt128Swapped(value, index);
 		}
 
 		/// <summary>
@@ -918,9 +940,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A single-precision floating point number formed by four bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static float ToSingle(byte[] value, bool bigEndian, int index=0)
+		public static float ToSingle(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToSingle(value, index):ToSingleSwapped(value, index);
+			return IsDoubleLittleEndian ^ bigEndian ? ToSingle(value, index) : ToSingleSwapped(value, index);
 		}
 
 		/// <summary>
@@ -930,9 +952,9 @@ namespace Free.Core
 		/// <param name="bigEndian">Specifies the byte-order the in the array. <c>true</c> for big-endian, <c>false</c> for little-endian.</param>
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <returns>A double-precision floating point number formed by eight bytes beginning at <paramref name="index"/> in a given byte-order.</returns>
-		public static double ToDouble(byte[] value, bool bigEndian, int index=0)
+		public static double ToDouble(byte[] value, bool bigEndian, int index = 0)
 		{
-			return IsLittleEndian^bigEndian?ToDouble(value, index):ToDoubleSwapped(value, index);
+			return IsDoubleLittleEndian ^ bigEndian ? ToDouble(value, index) : ToDoubleSwapped(value, index);
 		}
 		#endregion
 
@@ -944,20 +966,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes.</returns>
-		public static byte[] GetBytes(bool[] value, int index=0, int count=0)
+		public static byte[] GetBytes(bool[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count];
-			for(int i=0; i<count; i++) ret[i]=value[i]?(byte)1:(byte)0;
+			byte[] ret = new byte[count];
+			for (int i = 0; i < count; i++) ret[i] = value[i] ? (byte)1 : (byte)0;
 			return ret;
 		}
 
@@ -968,29 +990,29 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2.</returns>
-		public static unsafe byte[] GetBytes(char[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(char[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				char buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
 				}
 			}
 			return ret;
@@ -1003,29 +1025,29 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2.</returns>
-		public static unsafe byte[] GetBytes(short[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(short[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				short buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
 				}
 			}
 			return ret;
@@ -1039,29 +1061,29 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytes(ushort[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(ushort[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ushort buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
 				}
 			}
 			return ret;
@@ -1074,31 +1096,31 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4.</returns>
-		public static unsafe byte[] GetBytes(int[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(int[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				int buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
 				}
 			}
 			return ret;
@@ -1112,31 +1134,31 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytes(uint[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(uint[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				uint buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
 				}
 			}
 			return ret;
@@ -1149,35 +1171,35 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8.</returns>
-		public static unsafe byte[] GetBytes(long[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(long[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				long buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[7];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[7];
 				}
 			}
 			return ret;
@@ -1191,35 +1213,35 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytes(ulong[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(ulong[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ulong buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[7];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[7];
 				}
 			}
 			return ret;
@@ -1233,45 +1255,45 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 16.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytes(UInt128[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(UInt128[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*16];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 16];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ulong buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i].Low;
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[7];
+					buffer = value[index + i].Low;
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[7];
 
-					buffer=value[index+i].High;
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[7];
+					buffer = value[index + i].High;
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[7];
 				}
 			}
 			return ret;
@@ -1284,31 +1306,31 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4.</returns>
-		public static unsafe byte[] GetBytes(float[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(float[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				float buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
 				}
 			}
 			return ret;
@@ -1321,35 +1343,35 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8.</returns>
-		public static unsafe byte[] GetBytes(double[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytes(double[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				double buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[0];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[7];
+					buffer = value[index + i];
+					*(iRet++) = ptr[0];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[7];
 				}
 			}
 			return ret;
@@ -1364,20 +1386,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes in reversed byte-order to this computer architecture.</returns>
-		public static byte[] GetBytesSwapped(bool[] value, int index=0, int count=0)
+		public static byte[] GetBytesSwapped(bool[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count];
-			for(int i=0; i<count; i++) ret[i]=value[i]?(byte)1:(byte)0;
+			byte[] ret = new byte[count];
+			for (int i = 0; i < count; i++) ret[i] = value[i] ? (byte)1 : (byte)0;
 			return ret;
 		}
 
@@ -1388,29 +1410,29 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(char[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(char[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				char buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1423,29 +1445,29 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(short[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(short[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				short buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1459,29 +1481,29 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytesSwapped(ushort[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(ushort[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*2];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 2];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ushort buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1494,31 +1516,31 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(int[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(int[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				int buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1532,31 +1554,31 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytesSwapped(uint[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(uint[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				uint buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1569,35 +1591,35 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(long[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(long[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				long buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[7];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[7];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1611,35 +1633,35 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytesSwapped(ulong[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(ulong[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ulong buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[7];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[7];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1653,45 +1675,45 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 16 in reversed byte-order to this computer architecture.</returns>
 		[CLSCompliant(false)]
-		public static unsafe byte[] GetBytesSwapped(UInt128[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(UInt128[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*16];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 16];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				ulong buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i].High;
-					*(iRet++)=ptr[7];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i].High;
+					*(iRet++) = ptr[7];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 
-					buffer=value[index+i].Low;
-					*(iRet++)=ptr[7];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i].Low;
+					*(iRet++) = ptr[7];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1704,31 +1726,31 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(float[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(float[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*4];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 4];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				float buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1741,35 +1763,35 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in reversed byte-order to this computer architecture.</returns>
-		public static unsafe byte[] GetBytesSwapped(double[] value, int index=0, int count=0)
+		public static unsafe byte[] GetBytesSwapped(double[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of value minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			byte[] ret=new byte[count*8];
-			fixed(byte* pRet=ret)
+			byte[] ret = new byte[count * 8];
+			fixed (byte* pRet = ret)
 			{
-				byte* iRet=pRet;
+				byte* iRet = pRet;
 				double buffer;
-				byte* ptr=(byte*)&buffer;
-				for(int i=0; i<count; i++)
+				byte* ptr = (byte*)&buffer;
+				for (int i = 0; i < count; i++)
 				{
-					buffer=value[index+i];
-					*(iRet++)=ptr[7];
-					*(iRet++)=ptr[6];
-					*(iRet++)=ptr[5];
-					*(iRet++)=ptr[4];
-					*(iRet++)=ptr[3];
-					*(iRet++)=ptr[2];
-					*(iRet++)=ptr[1];
-					*(iRet++)=ptr[0];
+					buffer = value[index + i];
+					*(iRet++) = ptr[7];
+					*(iRet++) = ptr[6];
+					*(iRet++) = ptr[5];
+					*(iRet++) = ptr[4];
+					*(iRet++) = ptr[3];
+					*(iRet++) = ptr[2];
+					*(iRet++) = ptr[1];
+					*(iRet++) = ptr[0];
 				}
 			}
 			return ret;
@@ -1785,9 +1807,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes in the given byte-order.</returns>
-		public static byte[] GetBytes(bool[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(bool[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1798,9 +1820,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in the given byte-order.</returns>
-		public static byte[] GetBytes(char[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(char[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1811,9 +1833,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in the given byte-order.</returns>
-		public static byte[] GetBytes(short[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(short[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1825,9 +1847,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 2 in the given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static byte[] GetBytes(ushort[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(ushort[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1838,9 +1860,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in the given byte-order.</returns>
-		public static byte[] GetBytes(int[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(int[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1852,9 +1874,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in the given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static byte[] GetBytes(uint[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(uint[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1865,9 +1887,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in the given byte-order.</returns>
-		public static byte[] GetBytes(long[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(long[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1879,9 +1901,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in the given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static byte[] GetBytes(ulong[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(ulong[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1893,9 +1915,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 16 in the given byte-order.</returns>
 		[CLSCompliant(false)]
-		public static byte[] GetBytes(UInt128[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(UInt128[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1906,9 +1928,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 4 in the given byte-order.</returns>
-		public static byte[] GetBytes(float[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(float[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsDoubleLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -1919,9 +1941,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>An array of bytes with length multiple of 8 in the given byte-order.</returns>
-		public static byte[] GetBytes(double[] value, bool bigEndian, int index=0, int count=0)
+		public static byte[] GetBytes(double[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?GetBytes(value, index, count):GetBytesSwapped(value, index, count);
+			return IsDoubleLittleEndian ^ bigEndian ? GetBytes(value, index, count) : GetBytesSwapped(value, index, count);
 		}
 		#endregion
 
@@ -1933,20 +1955,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of bool values.</returns>
-		public static bool[] ToBooleanArray(byte[] value, int index=0, int count=0)
+		public static bool[] ToBooleanArray(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			bool[] ret=new bool[count];
-			for(int i=0; i<count; i++) ret[i]=value[index+i]!=0;
+			bool[] ret = new bool[count];
+			for (int i = 0; i < count; i++) ret[i] = value[index + i] != 0;
 			return ret;
 		}
 
@@ -1957,21 +1979,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of Unicode characters.</returns>
-		public static unsafe char[] ToCharArray(byte[] value, int index=0, int count=0)
+		public static unsafe char[] ToCharArray(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			char[] ret=new char[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((char*)ptr+i);
+			char[] ret = new char[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((char*)ptr + i);
 			return ret;
 		}
 
@@ -1982,21 +2004,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit signed integers.</returns>
-		public static unsafe short[] ToInt16Array(byte[] value, int index=0, int count=0)
+		public static unsafe short[] ToInt16Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			short[] ret=new short[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((short*)ptr+i);
+			short[] ret = new short[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((short*)ptr + i);
 			return ret;
 		}
 
@@ -2008,21 +2030,21 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static unsafe ushort[] ToUInt16Array(byte[] value, int index=0, int count=0)
+		public static unsafe ushort[] ToUInt16Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			ushort[] ret=new ushort[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((ushort*)ptr+i);
+			ushort[] ret = new ushort[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((ushort*)ptr + i);
 			return ret;
 		}
 
@@ -2033,21 +2055,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit signed integers.</returns>
-		public static unsafe int[] ToInt32Array(byte[] value, int index=0, int count=0)
+		public static unsafe int[] ToInt32Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			int[] ret=new int[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((int*)ptr+i);
+			int[] ret = new int[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((int*)ptr + i);
 			return ret;
 		}
 
@@ -2059,21 +2081,21 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static unsafe uint[] ToUInt32Array(byte[] value, int index=0, int count=0)
+		public static unsafe uint[] ToUInt32Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			uint[] ret=new uint[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((uint*)ptr+i);
+			uint[] ret = new uint[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((uint*)ptr + i);
 			return ret;
 		}
 
@@ -2084,21 +2106,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit signed integers.</returns>
-		public static unsafe long[] ToInt64Array(byte[] value, int index=0, int count=0)
+		public static unsafe long[] ToInt64Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			long[] ret=new long[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((long*)ptr+i);
+			long[] ret = new long[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((long*)ptr + i);
 			return ret;
 		}
 
@@ -2110,21 +2132,21 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static unsafe ulong[] ToUInt64Array(byte[] value, int index=0, int count=0)
+		public static unsafe ulong[] ToUInt64Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			ulong[] ret=new ulong[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((ulong*)ptr+i);
+			ulong[] ret = new ulong[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((ulong*)ptr + i);
 			return ret;
 		}
 
@@ -2136,21 +2158,21 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 128-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static unsafe UInt128[] ToUInt128Array(byte[] value, int index=0, int count=0)
+		public static unsafe UInt128[] ToUInt128Array(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*16>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 16.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 16 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 16.");
 
-			if(count==0) count=(value.Length-index)/16;
+			if (count == 0) count = (value.Length - index) / 16;
 
-			UInt128[] ret=new UInt128[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=new UInt128(*((ulong*)ptr+2*i+1), *((ulong*)ptr+2*i));
+			UInt128[] ret = new UInt128[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = new UInt128(*((ulong*)ptr + 2 * i + 1), *((ulong*)ptr + 2 * i));
 			return ret;
 		}
 
@@ -2161,21 +2183,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of single-precision floating point numbers.</returns>
-		public static unsafe float[] ToSingleArray(byte[] value, int index=0, int count=0)
+		public static unsafe float[] ToSingleArray(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			float[] ret=new float[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((float*)ptr+i);
+			float[] ret = new float[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((float*)ptr + i);
 			return ret;
 		}
 
@@ -2186,21 +2208,21 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of double-precision floating point numbers.</returns>
-		public static unsafe double[] ToDoubleArray(byte[] value, int index=0, int count=0)
+		public static unsafe double[] ToDoubleArray(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			double[] ret=new double[count];
-			fixed(byte* ptr=&value[index])
-				for(int i=0; i<count; i++) ret[i]=*((double*)ptr+i);
+			double[] ret = new double[count];
+			fixed (byte* ptr = &value[index])
+				for (int i = 0; i < count; i++) ret[i] = *((double*)ptr + i);
 			return ret;
 		}
 		#endregion
@@ -2213,20 +2235,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of bool values.</returns>
-		public static bool[] ToBooleanArraySwapped(byte[] value, int index=0, int count=0)
+		public static bool[] ToBooleanArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the index argument.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the index argument.");
 
-			if(count==0) count=value.Length-index;
+			if (count == 0) count = value.Length - index;
 
-			bool[] ret=new bool[count];
-			for(int i=0; i<count; i++) ret[i]=value[index+i]!=0;
+			bool[] ret = new bool[count];
+			for (int i = 0; i < count; i++) ret[i] = value[index + i] != 0;
 			return ret;
 		}
 
@@ -2237,20 +2259,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of Unicode characters.</returns>
-		public static char[] ToCharArraySwapped(byte[] value, int index=0, int count=0)
+		public static char[] ToCharArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			char[] ret=new char[count];
-			for(int i=0; i<count; i++, index+=2) ret[i]=(char)(value[index]<<8|value[index+1]);
+			char[] ret = new char[count];
+			for (int i = 0; i < count; i++, index += 2) ret[i] = (char)(value[index] << 8 | value[index + 1]);
 			return ret;
 		}
 
@@ -2261,20 +2283,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit signed integers.</returns>
-		public static short[] ToInt16ArraySwapped(byte[] value, int index=0, int count=0)
+		public static short[] ToInt16ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			short[] ret=new short[count];
-			for(int i=0; i<count; i++, index+=2) ret[i]=(short)(value[index]<<8|value[index+1]);
+			short[] ret = new short[count];
+			for (int i = 0; i < count; i++, index += 2) ret[i] = (short)(value[index] << 8 | value[index + 1]);
 			return ret;
 		}
 
@@ -2286,20 +2308,20 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static ushort[] ToUInt16ArraySwapped(byte[] value, int index=0, int count=0)
+		public static ushort[] ToUInt16ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*2>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 2 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 2.");
 
-			if(count==0) count=(value.Length-index)/2;
+			if (count == 0) count = (value.Length - index) / 2;
 
-			ushort[] ret=new ushort[count];
-			for(int i=0; i<count; i++, index+=2) ret[i]=(ushort)(value[index]<<8|value[index+1]);
+			ushort[] ret = new ushort[count];
+			for (int i = 0; i < count; i++, index += 2) ret[i] = (ushort)(value[index] << 8 | value[index + 1]);
 			return ret;
 		}
 
@@ -2310,20 +2332,20 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit signed integers.</returns>
-		public static int[] ToInt32ArraySwapped(byte[] value, int index=0, int count=0)
+		public static int[] ToInt32ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			int[] ret=new int[count];
-			for(int i=0; i<count; i++, index+=4) ret[i]=value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3];
+			int[] ret = new int[count];
+			for (int i = 0; i < count; i++, index += 4) ret[i] = value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3];
 			return ret;
 		}
 
@@ -2335,20 +2357,20 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static uint[] ToUInt32ArraySwapped(byte[] value, int index=0, int count=0)
+		public static uint[] ToUInt32ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			uint[] ret=new uint[count];
-			for(int i=0; i<count; i++, index+=4) ret[i]=(uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
+			uint[] ret = new uint[count];
+			for (int i = 0; i < count; i++, index += 4) ret[i] = (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
 			return ret;
 		}
 
@@ -2359,24 +2381,24 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit signed integers.</returns>
-		public static long[] ToInt64ArraySwapped(byte[] value, int index=0, int count=0)
+		public static long[] ToInt64ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			long[] ret=new long[count];
-			for(int i=0; i<count; i++, index+=8)
+			long[] ret = new long[count];
+			for (int i = 0; i < count; i++, index += 8)
 			{
-				uint a=(uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
-				uint b=(uint)(value[index+4]<<24|value[index+5]<<16|value[index+6]<<8|value[index+7]);
-				ret[i]=(long)a<<32|b;
+				uint a = (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
+				uint b = (uint)(value[index + 4] << 24 | value[index + 5] << 16 | value[index + 6] << 8 | value[index + 7]);
+				ret[i] = (long)a << 32 | b;
 			}
 			return ret;
 		}
@@ -2389,24 +2411,24 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static ulong[] ToUInt64ArraySwapped(byte[] value, int index=0, int count=0)
+		public static ulong[] ToUInt64ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			ulong[] ret=new ulong[count];
-			for(int i=0; i<count; i++, index+=8)
+			ulong[] ret = new ulong[count];
+			for (int i = 0; i < count; i++, index += 8)
 			{
-				uint a=(uint)(value[index]<<24|value[index+1]<<16|value[index+2]<<8|value[index+3]);
-				uint b=(uint)(value[index+4]<<24|value[index+5]<<16|value[index+6]<<8|value[index+7]);
-				ret[i]=(ulong)a<<32|b;
+				uint a = (uint)(value[index] << 24 | value[index + 1] << 16 | value[index + 2] << 8 | value[index + 3]);
+				uint b = (uint)(value[index + 4] << 24 | value[index + 5] << 16 | value[index + 6] << 8 | value[index + 7]);
+				ret[i] = (ulong)a << 32 | b;
 			}
 			return ret;
 		}
@@ -2419,21 +2441,21 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 128-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static UInt128[] ToUInt128ArraySwapped(byte[] value, int index=0, int count=0)
+		public static UInt128[] ToUInt128ArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*16>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 16.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 16 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 16.");
 
-			if(count==0) count=(value.Length-index)/16;
+			if (count == 0) count = (value.Length - index) / 16;
 
-			UInt128[] ret=new UInt128[count];
-			for(int i=0; i<count; i++, index+=16)
-				ret[i]=new UInt128(ToUInt64Swapped(value, index), ToUInt64Swapped(value, index+8));
+			UInt128[] ret = new UInt128[count];
+			for (int i = 0; i < count; i++, index += 16)
+				ret[i] = new UInt128(ToUInt64Swapped(value, index), ToUInt64Swapped(value, index + 8));
 
 			return ret;
 		}
@@ -2445,28 +2467,28 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of single-precision floating point numbers.</returns>
-		public static unsafe float[] ToSingleArraySwapped(byte[] value, int index=0, int count=0)
+		public static unsafe float[] ToSingleArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*4>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 4 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 4.");
 
-			if(count==0) count=(value.Length-index)/4;
+			if (count == 0) count = (value.Length - index) / 4;
 
-			float[] ret=new float[count];
-			fixed(float* pRet=ret)
+			float[] ret = new float[count];
+			fixed (float* pRet = ret)
 			{
-				int* iRet=(int*)pRet;
-				for(int i=0; i<count; i++, index+=8)
+				int* iRet = (int*)pRet;
+				for (int i = 0; i < count; i++, index += 8)
 				{
-					fixed(byte* pValue=&value[index])
+					fixed (byte* pValue = &value[index])
 					{
-						int v=*(int*)pValue;
-						*(iRet++)=v<<24|(v&0xff00)<<8|(v>>8&0xff00)|(v>>24&0xff);
+						int v = *(int*)pValue;
+						*(iRet++) = v << 24 | (v & 0xff00) << 8 | (v >> 8 & 0xff00) | (v >> 24 & 0xff);
 					}
 				}
 			}
@@ -2480,34 +2502,34 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of double-precision floating point numbers.</returns>
-		public static unsafe double[] ToDoubleArraySwapped(byte[] value, int index=0, int count=0)
+		public static unsafe double[] ToDoubleArraySwapped(byte[] value, int index = 0, int count = 0)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||index>value.Length)
+			if (index < 0 || index > value.Length)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than or equal to the length of value.");
 
-			if(count<0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
-			if(index+count*8>value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
+			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must be non-negative.");
+			if (index + count * 8 > value.Length) throw new ArgumentOutOfRangeException("count", "Must be less than or equal to the length of the byte array minus the offset argument divided by 8.");
 
-			if(count==0) count=(value.Length-index)/8;
+			if (count == 0) count = (value.Length - index) / 8;
 
-			double[] ret=new double[count];
-			fixed(double* pRet=ret)
+			double[] ret = new double[count];
+			fixed (double* pRet = ret)
 			{
-				byte* bRet=(byte*)pRet;
-				for(int i=0; i<count; i++, index+=8, bRet+=8)
+				byte* bRet = (byte*)pRet;
+				for (int i = 0; i < count; i++, index += 8, bRet += 8)
 				{
-					fixed(byte* pValue=&value[index])
+					fixed (byte* pValue = &value[index])
 					{
-						bRet[0]=pValue[7];
-						bRet[1]=pValue[6];
-						bRet[2]=pValue[5];
-						bRet[3]=pValue[4];
-						bRet[4]=pValue[3];
-						bRet[5]=pValue[2];
-						bRet[6]=pValue[1];
-						bRet[7]=pValue[0];
+						bRet[0] = pValue[7];
+						bRet[1] = pValue[6];
+						bRet[2] = pValue[5];
+						bRet[3] = pValue[4];
+						bRet[4] = pValue[3];
+						bRet[5] = pValue[2];
+						bRet[6] = pValue[1];
+						bRet[7] = pValue[0];
 					}
 				}
 			}
@@ -2524,9 +2546,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of bool values.</returns>
-		public static bool[] ToBooleanArray(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static bool[] ToBooleanArray(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToBooleanArray(value, index, count):ToBooleanArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToBooleanArray(value, index, count) : ToBooleanArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2537,9 +2559,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of Unicode characters.</returns>
-		public static char[] ToCharArray(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static char[] ToCharArray(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToCharArray(value, index, count):ToCharArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToCharArray(value, index, count) : ToCharArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2550,9 +2572,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit signed integers.</returns>
-		public static short[] ToInt16Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static short[] ToInt16Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt16Array(value, index, count):ToInt16ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToInt16Array(value, index, count) : ToInt16ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2564,9 +2586,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 16-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static ushort[] ToUInt16Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static ushort[] ToUInt16Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt16Array(value, index, count):ToUInt16ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToUInt16Array(value, index, count) : ToUInt16ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2577,9 +2599,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit signed integers.</returns>
-		public static int[] ToInt32Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static int[] ToInt32Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt32Array(value, index, count):ToInt32ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToInt32Array(value, index, count) : ToInt32ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2591,9 +2613,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 32-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static uint[] ToUInt32Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static uint[] ToUInt32Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt32Array(value, index, count):ToUInt32ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToUInt32Array(value, index, count) : ToUInt32ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2604,9 +2626,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit signed integers.</returns>
-		public static long[] ToInt64Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static long[] ToInt64Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToInt64Array(value, index, count):ToInt64ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToInt64Array(value, index, count) : ToInt64ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2618,9 +2640,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 64-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static ulong[] ToUInt64Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static ulong[] ToUInt64Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt64Array(value, index, count):ToUInt64ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToUInt64Array(value, index, count) : ToUInt64ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2632,9 +2654,9 @@ namespace Free.Core
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of 128-bit unsigned integers.</returns>
 		[CLSCompliant(false)]
-		public static UInt128[] ToUInt128Array(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static UInt128[] ToUInt128Array(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToUInt128Array(value, index, count):ToUInt128ArraySwapped(value, index, count);
+			return IsLittleEndian ^ bigEndian ? ToUInt128Array(value, index, count) : ToUInt128ArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2645,9 +2667,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of single-precision floating point numbers.</returns>
-		public static float[] ToSingleArray(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static float[] ToSingleArray(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToSingleArray(value, index, count):ToSingleArraySwapped(value, index, count);
+			return IsDoubleLittleEndian ^ bigEndian ? ToSingleArray(value, index, count) : ToSingleArraySwapped(value, index, count);
 		}
 
 		/// <summary>
@@ -2658,9 +2680,9 @@ namespace Free.Core
 		/// <param name="index">The starting position within <paramref name="value"/>.</param>
 		/// <param name="count">Number of elements to convert.</param>
 		/// <returns>The array of double-precision floating point numbers.</returns>
-		public static double[] ToDoubleArray(byte[] value, bool bigEndian, int index=0, int count=0)
+		public static double[] ToDoubleArray(byte[] value, bool bigEndian, int index = 0, int count = 0)
 		{
-			return IsLittleEndian^bigEndian?ToDoubleArray(value, index, count):ToDoubleArraySwapped(value, index, count);
+			return IsDoubleLittleEndian ^ bigEndian ? ToDoubleArray(value, index, count) : ToDoubleArraySwapped(value, index, count);
 		}
 		#endregion
 
@@ -2672,7 +2694,7 @@ namespace Free.Core
 		/// <returns>A string of hexadecimal pairs separated by hyphens, where each pair represents the corresponding element in <paramref name="value"/>.</returns>
 		public static string ToString(byte[] value)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 			return ToString(value, 0, value.Length);
 		}
 
@@ -2684,8 +2706,8 @@ namespace Free.Core
 		/// <returns>A string of hexadecimal pairs separated by hyphens, where each pair represents the corresponding element in <paramref name="value"/>.</returns>
 		public static string ToString(byte[] value, int index)
 		{
-			if(value==null) throw new ArgumentNullException("value");
-			return ToString(value, index, value.Length-index);
+			if (value == null) throw new ArgumentNullException("value");
+			return ToString(value, index, value.Length - index);
 		}
 
 		/// <summary>
@@ -2697,34 +2719,34 @@ namespace Free.Core
 		/// <returns>A string of hexadecimal pairs separated by hyphens, where each pair represents the corresponding element in <paramref name="value"/>.</returns>
 		public static string ToString(byte[] value, int index, int length)
 		{
-			if(value==null) throw new ArgumentNullException("value");
+			if (value == null) throw new ArgumentNullException("value");
 
-			if(index<0||(index>=value.Length&&index>0)) // ignore special case (value.Length==index==length==0)
+			if (index < 0 || (index >= value.Length && index > 0)) // ignore special case (value.Length==index==length==0)
 				throw new ArgumentOutOfRangeException("index", "Must be non-negative and less than the length of value.");
 
-			if(length<0||index>value.Length-length||length>715827882)
+			if (length < 0 || index > value.Length - length || length > 715827882)
 				throw new ArgumentOutOfRangeException("length", "Must be non-negative, less than or equal to the length of value minus index and less than 715827883.");
 
-			if(length==0/*&&index==0&&value.Length==0*/) return string.Empty;
+			if (length == 0/*&&index==0&&value.Length==0*/) return string.Empty;
 
-			char[] ret=new char[length*3-1];
-			int pos=0;
+			char[] ret = new char[length * 3 - 1];
+			int pos = 0;
 
-			byte val=value[index];
-			int h=val/16;
-			int l=val%16;
-			ret[pos++]=h<10?(char)('0'+h):(char)('A'+h-10);
-			ret[pos++]=l<10?(char)('0'+l):(char)('A'+l-10);
+			byte val = value[index];
+			int h = val / 16;
+			int l = val % 16;
+			ret[pos++] = h < 10 ? (char)('0' + h) : (char)('A' + h - 10);
+			ret[pos++] = l < 10 ? (char)('0' + l) : (char)('A' + l - 10);
 
-			int end=index+length;
-			for(int i=index+1; i<end; i++)
+			int end = index + length;
+			for (int i = index + 1; i < end; i++)
 			{
-				ret[pos++]='-';
-				val=value[i];
-				h=val/16;
-				l=val%16;
-				ret[pos++]=h<10?(char)('0'+h):(char)('A'+h-10);
-				ret[pos++]=l<10?(char)('0'+l):(char)('A'+l-10);
+				ret[pos++] = '-';
+				val = value[i];
+				h = val / 16;
+				l = val % 16;
+				ret[pos++] = h < 10 ? (char)('0' + h) : (char)('A' + h - 10);
+				ret[pos++] = l < 10 ? (char)('0' + l) : (char)('A' + l - 10);
 			}
 
 			return new string(ret, 0, ret.Length);
@@ -2739,7 +2761,12 @@ namespace Free.Core
 		/// <returns>A 64-bit signed integer whose value is equivalent to <paramref name="value"/>.</returns>
 		public unsafe static long DoubleToInt64Bits(double value)
 		{
-			return *(long*)&value;
+			if (!IsLittleEndian ^ IsDoubleLittleEndian) return *(long*)&value;
+
+			byte* bytes = (byte*)&value;
+			uint a = (uint)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
+			uint b = (uint)(bytes[4] << 24 | bytes[5] << 16 | bytes[6] << 8 | bytes[7]);
+			return (long)a << 32 | b;
 		}
 
 		/// <summary>
@@ -2749,7 +2776,22 @@ namespace Free.Core
 		/// <returns>A double-precision floating point number whose value is equivalent to <paramref name="value"/>.</returns>
 		public unsafe static double Int64BitsToDouble(long value)
 		{
-			return *(double*)&value;
+			if (!IsLittleEndian ^ IsDoubleLittleEndian) return *(double*)&value;
+
+			byte* bytes = (byte*)&value;
+
+			double ret;
+			byte* pRet = (byte*)&ret;
+			pRet[0] = bytes[7];
+			pRet[1] = bytes[6];
+			pRet[2] = bytes[5];
+			pRet[3] = bytes[4];
+			pRet[4] = bytes[3];
+			pRet[5] = bytes[2];
+			pRet[6] = bytes[1];
+			pRet[7] = bytes[0];
+
+			return ret;
 		}
 		#endregion
 	}
