@@ -56,6 +56,7 @@
     <Compile Include="Collections\Internal\PDLParser.cs" />
     <Compile Include="Collections\Internal\ParametersToPDLConverter.cs" />
     <Compile Include="Exceptions\TextParserException.cs" />
+    <Compile Include="Extensions\CharExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="IO\BufferedBinaryReader.cs" />
     <Compile Include="ByteOrder.cs" />

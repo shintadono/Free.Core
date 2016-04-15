@@ -20,7 +20,7 @@ namespace Free.Core.Collections
 		/// <param name="bits">The <see cref="Bitfield"/> to initalize with.</param>
 		public Bitfield(Bitfield bits)
 		{
-			if (bits == null) throw new ArgumentNullException("bits");
+			if (bits == null) throw new ArgumentNullException(nameof(bits));
 			this.length = bits.length;
 			bitfield = new uint[bits.bitfield.Length];
 			Array.Copy(bits.bitfield, bitfield, bitfield.Length);
@@ -49,7 +49,7 @@ namespace Free.Core.Collections
 		/// <param name="values">The list of values to initialize with.</param>
 		public Bitfield(List<bool> values)
 		{
-			if (values == null) throw new ArgumentNullException("values");
+			if (values == null) throw new ArgumentNullException(nameof(values));
 			length = (uint)values.Count;
 			int uints = (int)(length + 31) / 32;
 			bitfield = new uint[uints];
@@ -63,7 +63,7 @@ namespace Free.Core.Collections
 		/// <param name="values">The array of values to initialize with.</param>
 		public Bitfield(bool[] values)
 		{
-			if (values == null) throw new ArgumentNullException("values");
+			if (values == null) throw new ArgumentNullException(nameof(values));
 			length = (uint)values.Length;
 			int uints = (int)(length + 31) / 32;
 			bitfield = new uint[uints];
@@ -78,7 +78,7 @@ namespace Free.Core.Collections
 		/// <returns>The value of the bit.</returns>
 		public bool Get(int bit)
 		{
-			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be equal or greater than 0 and less than Length.");
+			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be equal or greater than 0 and less than Length.");
 			return (bitfield[bit / 32] & (1u << (bit % 32))) != 0;
 		}
 
@@ -89,7 +89,7 @@ namespace Free.Core.Collections
 		/// <returns>The value of the bit.</returns>
 		public bool Get(uint bit)
 		{
-			if (bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be less than Length.");
+			if (bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be less than Length.");
 			return (bitfield[(int)(bit / 32)] & (1u << ((int)(bit % 32)))) != 0;
 		}
 
@@ -99,7 +99,7 @@ namespace Free.Core.Collections
 		/// <param name="bit">The index of the bit.</param>
 		public void Set(int bit)
 		{
-			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be equal or greater than 0 and less than Length.");
+			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be equal or greater than 0 and less than Length.");
 			bitfield[bit / 32] |= 1u << (bit % 32);
 		}
 
@@ -109,7 +109,7 @@ namespace Free.Core.Collections
 		/// <param name="bit">The index of the bit.</param>
 		public void Set(uint bit)
 		{
-			if (bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be less than Length.");
+			if (bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be less than Length.");
 			bitfield[(int)(bit / 32)] |= 1u << ((int)(bit % 32));
 		}
 
@@ -120,8 +120,8 @@ namespace Free.Core.Collections
 		/// <param name="to">The index of the last bit.</param>
 		public void Set(int from, int to)
 		{
-			if (from < 0 || from >= length) throw new ArgumentOutOfRangeException("from", "Must be equal or greater than 0 and less than Length.");
-			if (to < 0 || to >= length) throw new ArgumentOutOfRangeException("to", "Must be equal or greater than 0 and less than Length.");
+			if (from < 0 || from >= length) throw new ArgumentOutOfRangeException(nameof(from), "Must be equal or greater than 0 and less than Length.");
+			if (to < 0 || to >= length) throw new ArgumentOutOfRangeException(nameof(to), "Must be equal or greater than 0 and less than Length.");
 			Set((uint)from, (uint)to);
 		}
 
@@ -132,8 +132,8 @@ namespace Free.Core.Collections
 		/// <param name="to">The index of the last bit.</param>
 		public void Set(uint from, uint to)
 		{
-			if (from >= length) throw new ArgumentOutOfRangeException("from", "Must be less than Length.");
-			if (to >= length) throw new ArgumentOutOfRangeException("to", "Must be less than Length.");
+			if (from >= length) throw new ArgumentOutOfRangeException(nameof(from), "Must be less than Length.");
+			if (to >= length) throw new ArgumentOutOfRangeException(nameof(to), "Must be less than Length.");
 
 			if (from == to) { Set(from); return; }
 
@@ -178,7 +178,7 @@ namespace Free.Core.Collections
 		/// <param name="bit">The index of the bit.</param>
 		public void Reset(int bit)
 		{
-			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be equal or greater than 0 and less than Length.");
+			if (bit < 0 || bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be equal or greater than 0 and less than Length.");
 			bitfield[bit / 32] &= ~(1u << (bit % 32));
 		}
 
@@ -188,7 +188,7 @@ namespace Free.Core.Collections
 		/// <param name="bit">The index of the bit.</param>
 		public void Reset(uint bit)
 		{
-			if (bit >= length) throw new ArgumentOutOfRangeException("bit", "Must be less than Length.");
+			if (bit >= length) throw new ArgumentOutOfRangeException(nameof(bit), "Must be less than Length.");
 			bitfield[(int)(bit / 32)] &= ~(1u << ((int)(bit % 32)));
 		}
 
@@ -199,8 +199,8 @@ namespace Free.Core.Collections
 		/// <param name="to">The index of the last bit.</param>
 		public void Reset(int from, int to)
 		{
-			if (from < 0 || from >= length) throw new ArgumentOutOfRangeException("from", "Must be equal or greater than 0 and less than Length.");
-			if (to < 0 || to >= length) throw new ArgumentOutOfRangeException("to", "Must be equal or greater than 0 and less than Length.");
+			if (from < 0 || from >= length) throw new ArgumentOutOfRangeException(nameof(from), "Must be equal or greater than 0 and less than Length.");
+			if (to < 0 || to >= length) throw new ArgumentOutOfRangeException(nameof(to), "Must be equal or greater than 0 and less than Length.");
 			Reset((uint)from, (uint)to);
 		}
 
@@ -211,8 +211,8 @@ namespace Free.Core.Collections
 		/// <param name="to">The index of the last bit.</param>
 		public void Reset(uint from, uint to)
 		{
-			if (from >= length) throw new ArgumentOutOfRangeException("from", "Must be less than Length.");
-			if (to >= length) throw new ArgumentOutOfRangeException("to", "Must be less than Length.");
+			if (from >= length) throw new ArgumentOutOfRangeException(nameof(from), "Must be less than Length.");
+			if (to >= length) throw new ArgumentOutOfRangeException(nameof(to), "Must be less than Length.");
 
 			if (from == to) { Reset(from); return; }
 
@@ -280,9 +280,9 @@ namespace Free.Core.Collections
 		/// <param name="index">The index in the <paramref name="destination"/> array at which copying begins.</param>
 		public void CopyTo(Array destination, int index)
 		{
-			if (destination == null) throw new ArgumentNullException("destination");
-			if (index < 0) throw new ArgumentOutOfRangeException("index", "Must be not negative.");
-			if (destination.Rank != 1) throw new ArgumentException("Must be a 1-dimensional array", "destination");
+			if (destination == null) throw new ArgumentNullException(nameof(destination));
+			if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), "Must not be less than zero (0).");
+			if (destination.Rank != 1) throw new ArgumentException("Must be a 1-dimensional array.", nameof(destination));
 
 			bool[] dst = destination as bool[];
 			if (dst == null) throw new NotSupportedException("Only bool[] supported.");

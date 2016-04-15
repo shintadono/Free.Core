@@ -30,9 +30,9 @@ namespace Free.Core.IO
 		/// <param name="bufferSize">The size of the buffer.</param>
 		public BufferedBinaryReader(Stream input, int bufferSize = 0x10000)
 		{
-			if (input == null) throw new ArgumentNullException("input");
-			if (!input.CanRead) throw new ArgumentException("Stream not readable.", "input");
-			if (bufferSize <= 0) throw new ArgumentOutOfRangeException("bufferSize", "Must be greater than zero.");
+			if (input == null) throw new ArgumentNullException(nameof(input));
+			if (!input.CanRead) throw new ArgumentException("Stream not readable.", nameof(input));
+			if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize), "Must be greater than zero.");
 
 			i_buffer = new byte[8];
 
@@ -93,9 +93,9 @@ namespace Free.Core.IO
 		/// <returns>The number of bytes read into the <paramref name="buffer"/>.</returns>
 		public virtual int Read(byte[] buffer, int index, int count)
 		{
-			if (buffer == null) throw new ArgumentNullException("buffer");
-			if (index < 0) throw new ArgumentOutOfRangeException("index");
-			if (count < 0) throw new ArgumentOutOfRangeException("count");
+			if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+			if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
+			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
 			if ((buffer.Length - index) < count) throw new ArgumentException();
 			if (m_stream == null) throw new ObjectDisposedException(null, "File closed");
 
@@ -156,7 +156,7 @@ namespace Free.Core.IO
 		/// than <paramref name="count"/>, if the end of the stream/file is reached.</returns>
 		public virtual byte[] ReadBytes(int count)
 		{
-			if (count < 0) throw new ArgumentOutOfRangeException("count", "Must not by smaller than zero (0).");
+			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Must not by smaller than zero (0).");
 			if (m_stream == null) throw new ObjectDisposedException(null, "File closed");
 			byte[] buffer = new byte[count];
 
