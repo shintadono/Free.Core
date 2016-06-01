@@ -127,7 +127,7 @@ namespace Free.Core.Collections.Generic
 		}
 
 		/// <summary>
-		/// Removes all keys and values from the <see cref="LinkedDictionary{TKey, TValue}"/>.
+		/// Removes all keys and values from a <see cref="LinkedDictionary{TKey, TValue}"/>.
 		/// </summary>
 		public void Clear()
 		{
@@ -146,7 +146,7 @@ namespace Free.Core.Collections.Generic
 		}
 
 		/// <summary>
-		/// Removes the value with the specified key from the <see cref="LinkedDictionary{TKey, TValue}"/>.
+		/// Removes the value with the specified key from a <see cref="LinkedDictionary{TKey, TValue}"/>.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>
 		/// <returns><b>true</b> if the element is successfully found and removed; otherwise, <b>false</b>.
