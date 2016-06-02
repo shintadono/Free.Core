@@ -113,11 +113,29 @@ namespace Free.Core.Collections.Generic
 		}
 
 		#region Implements ISet<T>
+		/// <summary>
+		/// Modifies the current set so that it contains all elements that are present in
+		/// the current set, in the specified collection, or in both.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
 		public void UnionWith(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			foreach (var item in other)
+			{
+				if (dict.ContainsKey(item)) continue;
+
+				LinkedListNode<T> node = list.AddLast(item);
+				dict.Add(item, node);
+			}
 		}
 
+		/// <summary>
+		/// Modifies the current set so that it contains only elements that are also in a
+		/// specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
 		public void IntersectWith(IEnumerable<T> other)
 		{
 			if (other == null) throw new ArgumentNullException(nameof(other));
@@ -200,6 +218,10 @@ namespace Free.Core.Collections.Generic
 			while (list.Count > 0 && c != list.First);
 		}
 
+		/// <summary>
+		/// Removes all elements in the specified collection from the current set.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
 		public void ExceptWith(IEnumerable<T> other)
 		{
 			if (other == null) throw new ArgumentNullException(nameof(other));
@@ -207,9 +229,78 @@ namespace Free.Core.Collections.Generic
 			foreach (T item in other) Remove(item);
 		}
 
+		/// <summary>
+		/// Modifies the current set so that it contains only elements that are present either
+		/// in the current set or in the specified collection, but not both.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
 		public void SymmetricExceptWith(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			if (dict.Count == 0) // 0 XOR x == x
+			{
+				UnionWith(other);
+				return;
+			}
+
+			if (ReferenceEquals(this, other)) // x XOR x == 0
+			{
+				Clear();
+				return;
+			}
+
+			var c = list.First;
+			if (c == null) return;
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				if (collection.Count == 0) return; // x XOR 0 == x
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				HashSet<T> hs = other as HashSet<T>;
+				if ((lhs != null && Comparer.Equals(lhs.Comparer))|| (hs != null && Comparer.Equals(hs.Comparer))) // No dupicates in other.
+				{
+					foreach (var item in other)
+					{
+						LinkedListNode<T> node;
+						if (dict.TryGetValue(item, out node))
+						{
+							dict.Remove(item);
+							list.Remove(node);
+						}
+						else
+						{
+							node = list.AddLast(item);
+							dict.Add(item, node);
+						}
+					}
+
+					return;
+				}
+			}
+
+			LinkedHashSet<T> add = new LinkedHashSet<T>(dict.Comparer);
+			HashSet<LinkedListNode<T>> remove = new HashSet<LinkedListNode<T>>();
+			foreach (var item in other)
+			{
+				LinkedListNode<T> node;
+				if (dict.TryGetValue(item, out node)) remove.Add(node);
+				else add.Add(item);
+			}
+
+			foreach(var node in remove)
+			{
+				dict.Remove(node.Value);
+				list.Remove(node);
+			}
+
+			foreach (var item in add)
+			{
+				LinkedListNode<T> node = list.AddLast(item);
+				dict.Add(item, node);
+			}
 		}
 
 		public bool IsSubsetOf(IEnumerable<T> other)
@@ -232,9 +323,20 @@ namespace Free.Core.Collections.Generic
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Determines whether the current set overlaps with the specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set and other share at least one common element; otherwise, <b>false</b>.</returns>
 		public bool Overlaps(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			if (dict.Count == 0) return false;
+
+			foreach (T item in other) if (dict.ContainsKey(item)) return true;
+
+			return false;
 		}
 
 		public bool SetEquals(IEnumerable<T> other)
