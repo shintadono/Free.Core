@@ -10,12 +10,7 @@ namespace Free.Core.Collections.Generic
 	/// <typeparam name="T">The type of elements in the hash set.</typeparam>
 	public class LinkedHashSet<T> : ISet<T>
 	{
-		const string ExpectionMessageCollectionIsReadOnly = "Collection is read only.";
-		const string ExpectionMessageWrongType = "Wrong type.";
-		const string ExpectionMessageInvalidArrayType = "Invalid array type.";
-		const string ExpectionMessageArrayPlusOffsetTooSmall = "Array (plus offset) too small.";
-		const string ExpectionMessageArrayRankNotOne = "Array with rank not equal to one (1) is not supported.";
-		const string ExpectionMessageArrayLowerBoundNotZero = "Array with lower bound not equal to zero (0) is not supported.";
+		const string ExpectionMessageThisShouldNotBePossible = "This should not be possible. (LinkedHashSet<T>.SymmetricExceptWith)";
 
 		#region Variables
 		Dictionary<T, LinkedListNode<T>> dict;
@@ -122,6 +117,8 @@ namespace Free.Core.Collections.Generic
 		{
 			if (other == null) throw new ArgumentNullException(nameof(other));
 
+			if (ReferenceEquals(this, other)) return; // We union with ourself, so no element will added.
+
 			foreach (var item in other)
 			{
 				if (dict.ContainsKey(item)) continue;
@@ -170,7 +167,7 @@ namespace Free.Core.Collections.Generic
 
 						c = next;
 					}
-					while (list.Count > 0 && c != list.First);
+					while (c != null);
 
 					return;
 				}
@@ -190,7 +187,7 @@ namespace Free.Core.Collections.Generic
 
 						c = next;
 					}
-					while (list.Count > 0 && c != list.First);
+					while (c != null);
 
 					return;
 				}
@@ -215,7 +212,7 @@ namespace Free.Core.Collections.Generic
 
 				c = next;
 			}
-			while (list.Count > 0 && c != list.First);
+			while (c != null);
 		}
 
 		/// <summary>
@@ -226,7 +223,13 @@ namespace Free.Core.Collections.Generic
 		{
 			if (other == null) throw new ArgumentNullException(nameof(other));
 
-			foreach (T item in other) Remove(item);
+			if (ReferenceEquals(this, other))
+			{
+				Clear();
+				return;
+			}
+
+			foreach (var item in other) Remove(item);
 		}
 
 		/// <summary>
@@ -251,7 +254,7 @@ namespace Free.Core.Collections.Generic
 			}
 
 			var c = list.First;
-			if (c == null) return;
+			if (c == null) throw new Exception(ExpectionMessageThisShouldNotBePossible);
 
 			ICollection<T> collection = other as ICollection<T>;
 			if (collection != null)
@@ -260,7 +263,7 @@ namespace Free.Core.Collections.Generic
 
 				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
 				HashSet<T> hs = other as HashSet<T>;
-				if ((lhs != null && Comparer.Equals(lhs.Comparer))|| (hs != null && Comparer.Equals(hs.Comparer))) // No dupicates in other.
+				if ((lhs != null && Comparer.Equals(lhs.Comparer)) || (hs != null && Comparer.Equals(hs.Comparer))) // No duplicates in other.
 				{
 					foreach (var item in other)
 					{
@@ -290,7 +293,7 @@ namespace Free.Core.Collections.Generic
 				else add.Add(item);
 			}
 
-			foreach(var node in remove)
+			foreach (var node in remove)
 			{
 				dict.Remove(node.Value);
 				list.Remove(node);
@@ -303,24 +306,194 @@ namespace Free.Core.Collections.Generic
 			}
 		}
 
+		/// <summary>
+		/// Determines whether a set is a subset of a specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set is a subset of other; otherwise, <b>false</b>.</returns>
 		public bool IsSubsetOf(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			// Empty set is subset of any set and set can be a subset of itself.
+			if (dict.Count == 0 || ReferenceEquals(this, other)) return true;
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				// If this set has more elements than the other set, it can't be a subset.
+				if (dict.Count > collection.Count) return false;
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				if (lhs != null && Comparer.Equals(lhs.Comparer))
+				{
+					foreach (var item in this)
+					{
+						if (!lhs.dict.ContainsKey(item)) return false;
+					}
+
+					return true;
+				}
+
+				HashSet<T> hs = other as HashSet<T>;
+				if (hs != null && Comparer.Equals(hs.Comparer))
+				{
+					foreach (var item in this)
+					{
+						if (!hs.Contains(item)) return false;
+					}
+
+					return true;
+				}
+			}
+
+			int notFound = 0;
+			HashSet<LinkedListNode<T>> uniqueFound = new HashSet<LinkedListNode<T>>();
+			foreach (var item in other)
+			{
+				LinkedListNode<T> node;
+				if (dict.TryGetValue(item, out node)) uniqueFound.Add(node);
+				else notFound++;
+			}
+
+			return uniqueFound.Count == Count && notFound >= 0;
 		}
 
-		public bool IsSupersetOf(IEnumerable<T> other)
-		{
-			throw new NotImplementedException();
-		}
-
-		public bool IsProperSupersetOf(IEnumerable<T> other)
-		{
-			throw new NotImplementedException();
-		}
-
+		/// <summary>
+		/// Determines whether a set is a proper subset of a specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set is a proper subset of other; otherwise, <b>false</b>.</returns>
 		public bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			if (ReferenceEquals(this, other)) return false; // Set can not be a proper subset of itself.
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				// The empty set is a proper subset of anything but the empty set.
+				if (dict.Count == 0) return collection.Count > 0;
+
+				// If this set has equal number or more elements than the other set, it can't be a proper subset.
+				if (dict.Count >= collection.Count) return false;
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				if (lhs != null && Comparer.Equals(lhs.Comparer))
+				{
+					foreach (var item in this)
+					{
+						if (!lhs.dict.ContainsKey(item)) return false;
+					}
+
+					return true;
+				}
+
+				HashSet<T> hs = other as HashSet<T>;
+				if (hs != null && Comparer.Equals(hs.Comparer))
+				{
+					foreach (var item in this)
+					{
+						if (!hs.Contains(item)) return false;
+					}
+
+					return true;
+				}
+			}
+
+			if (dict.Count == 0)
+			{
+				// The empty set is a proper subset of anything but the empty set.
+				foreach (var item in other) return true;
+				return false;
+			}
+
+			int notFound = 0;
+			HashSet<LinkedListNode<T>> uniqueFound = new HashSet<LinkedListNode<T>>();
+			foreach (var item in other)
+			{
+				LinkedListNode<T> node;
+				if (dict.TryGetValue(item, out node)) uniqueFound.Add(node);
+				else notFound++;
+			}
+
+			return uniqueFound.Count == Count && notFound > 0; // At least one element of the other set, should not be in this set, but all of this set must be in other.
+		}
+
+		/// <summary>
+		/// Determines whether a set is a superset of a specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set is a superset of other; otherwise, <b>false</b>.</returns>
+		public bool IsSupersetOf(IEnumerable<T> other)
+		{
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				// If the other set is empty, it is a superset of this.
+				if (collection.Count == 0) return true;
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				HashSet<T> hs = other as HashSet<T>;
+				if ((lhs != null && Comparer.Equals(lhs.Comparer)) || (hs != null && Comparer.Equals(hs.Comparer)))
+				{
+					if (dict.Count < collection.Count) return false;
+				}
+			}
+
+			foreach (var item in other)
+			{
+				if (!dict.ContainsKey(item)) return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Determines whether a set is a proper superset of a specified collection.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set is a proper superset of other; otherwise, <b>false</b>.</returns>
+		public bool IsProperSupersetOf(IEnumerable<T> other)
+		{
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			// Empty set is never a proper superset of any set and set can not be a proper superset of itself.
+			if (dict.Count == 0 || ReferenceEquals(this, other)) return false;
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				// If the other set is empty (and since we checked that this set has at least one element above), it is a proper superset of this.
+				if (collection.Count == 0) return true;
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				HashSet<T> hs = other as HashSet<T>;
+				if ((lhs != null && Comparer.Equals(lhs.Comparer)) || (hs != null && Comparer.Equals(hs.Comparer)))
+				{
+					if (dict.Count <= collection.Count) return false;
+
+					foreach (var item in other)
+					{
+						if (!dict.ContainsKey(item)) return false;
+					}
+
+					return true;
+				}
+			}
+
+			HashSet<LinkedListNode<T>> uniqueFound = new HashSet<LinkedListNode<T>>();
+			foreach (var item in other)
+			{
+				LinkedListNode<T> node;
+				if (dict.TryGetValue(item, out node)) uniqueFound.Add(node);
+				else return false;
+			}
+
+			return uniqueFound.Count < dict.Count; // At least one element of this set, should not be in the other set.
 		}
 
 		/// <summary>
@@ -334,14 +507,59 @@ namespace Free.Core.Collections.Generic
 
 			if (dict.Count == 0) return false;
 
-			foreach (T item in other) if (dict.ContainsKey(item)) return true;
+			foreach (var item in other) if (dict.ContainsKey(item)) return true;
 
 			return false;
 		}
 
+		/// <summary>
+		/// Determines whether the current set and the specified collection contain the same elements.
+		/// </summary>
+		/// <param name="other">The collection to compare to the current set.</param>
+		/// <returns><b>true</b> if the current set is equal to other; otherwise, <b>false</b>.</returns>
 		public bool SetEquals(IEnumerable<T> other)
 		{
-			throw new NotImplementedException();
+			if (other == null) throw new ArgumentNullException(nameof(other));
+
+			if (ReferenceEquals(this, other)) return true;
+
+			ICollection<T> collection = other as ICollection<T>;
+			if (collection != null)
+			{
+				// If this set is empty but other contains at least one element, they can't be equal.
+				if (dict.Count == 0 && collection.Count > 0) return false;
+
+				LinkedHashSet<T> lhs = other as LinkedHashSet<T>;
+				HashSet<T> hs = other as HashSet<T>;
+				if ((lhs != null && Comparer.Equals(lhs.Comparer)) || (hs != null && Comparer.Equals(hs.Comparer)))
+				{
+					if (dict.Count != collection.Count) return false;
+
+					foreach (var item in other)
+					{
+						if (!dict.ContainsKey(item)) return false;
+					}
+
+					return true;
+				}
+			}
+
+			if (dict.Count == 0)
+			{
+				// If this set is empty but other contains at least one element, they can't be equal.
+				foreach (var item in other) return false;
+				return true;
+			}
+
+			HashSet<LinkedListNode<T>> uniqueFound = new HashSet<LinkedListNode<T>>();
+			foreach (var item in other)
+			{
+				LinkedListNode<T> node;
+				if (dict.TryGetValue(item, out node)) uniqueFound.Add(node);
+				else return false;
+			}
+
+			return uniqueFound.Count == Count;
 		}
 		#endregion
 
