@@ -5,9 +5,9 @@ using System.Diagnostics;
 namespace Free.Core.Collections.Generic
 {
 	/// <summary>
-	/// TODO
+	/// Represents a list of values, with an order specified by an implementation of <see cref="IComparer{T}"/>.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">The type of elements in the priority queue.</typeparam>
 	[DebuggerDisplay("Count = {Count}")]
 	public class PriorityQueue<T>
 	{
@@ -15,103 +15,114 @@ namespace Free.Core.Collections.Generic
 		IComparer<T> comparer;
 
 		/// <summary>
-		/// TODO
+		/// Initializes a new instance of the <see cref="PriorityQueue{T}"/> class that is empty.
 		/// </summary>
-		public PriorityQueue()
+		/// <param name="comparer">The implementation of <see cref="IComparer{T}"/> to use for the sorting of the <see cref="PriorityQueue{T}"/>.
+		/// Can be <b>null</b>; in this case the default comparer of <typeparamref name="T"/> is used (see <see cref="Comparer{T}.Default"/>).</param>
+		public PriorityQueue(IComparer<T> comparer = null)
 		{
-			entries=new List<T>();
-			comparer=Comparer<T>.Default;
+			entries = new List<T>();
+
+			if (comparer == null) comparer = Comparer<T>.Default;
+			this.comparer = comparer;
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets the number of elements contained in the <see cref="PriorityQueue{T}"/>.
 		/// </summary>
 		public int Count { get { return entries.Count; } }
 
 		/// <summary>
-		/// TODO
+		/// Indicates whether the <see cref="PriorityQueue{T}"/> is empty.
 		/// </summary>
-		/// <returns></returns>
-		public bool Empty() { return entries.Count==0; }
+		public bool IsEmpty { get { return entries.Count == 0; } }
 
 		/// <summary>
-		/// TODO
+		/// Removes all elements from a <see cref="PriorityQueue{T}"/>.
 		/// </summary>
 		public void Clear() { entries.Clear(); }
 
 		/// <summary>
-		/// TODO
+		/// Adds an element to an instance of <see cref="PriorityQueue{T}"/>.
 		/// </summary>
-		/// <param name="entry"></param>
-		public void Add(T entry)
+		/// <param name="item">The element to be added to the <see cref="PriorityQueue{T}"/>.</param>
+		public void Add(T item)
 		{
-			if(entry==null) throw new ArgumentNullException("entry");
+			if (item == null) throw new ArgumentNullException(nameof(item));
 
-			entries.Add(entry);
-			if(entries.Count<=1) return;
+			entries.Add(item);
+			if (entries.Count <= 1) return;
 
-			int emptyslot=entries.Count-1;
-			for(int i=(emptyslot-1)/2; emptyslot>0&&comparer.Compare(entries[i], entry)==1; i=(emptyslot-1)/2)
+			int emptyslot = entries.Count - 1;
+			for (int i = (emptyslot - 1) / 2; emptyslot > 0 && comparer.Compare(entries[i], item) == 1; i = (emptyslot - 1) / 2)
 			{
-				entries[emptyslot]=entries[i];
-				emptyslot=i;
+				entries[emptyslot] = entries[i];
+				emptyslot = i;
 			}
 
-			entries[emptyslot]=entry;
+			entries[emptyslot] = item;
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets the top element of the <see cref="PriorityQueue{T}"/>.
 		/// </summary>
-		/// <returns></returns>
-		public T Top()
+		/// <returns>The top element of the queue, or if queue is empty the default of the type <typeparamref name="T"/>.</returns>
+		public T Top
 		{
-			if(entries.Count==0) return default(T);
-			return entries[0];
+			get
+			{
+				if (entries.Count == 0) return default(T);
+				return entries[0];
+			}
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets and removes the top element of the <see cref="PriorityQueue{T}"/>.
 		/// </summary>
-		public void Pop()
+		/// <returns>The top element of the queue, or if queue is empty the default of the type <typeparamref name="T"/>.</returns>
+		public T Pop()
 		{
-			if(entries.Count>1)
+			T top = Top;
+
+			if (entries.Count > 1)
 			{
-				// save last slot's entry
-				int lastslot=entries.Count-1;
-				T entry=entries[lastslot];
+				// Save last slot's entry.
+				int lastslot = entries.Count - 1;
+				T entry = entries[lastslot];
 
-				// move top entry to last slot
-				entries[lastslot]=entries[0];
+				// Move top entry to last slot.
+				entries[lastslot] = entries[0];
 
-				int emptyslot=0;
-				int i=2*emptyslot+2;
+				int emptyslot = 0;
+				int i = 2 * emptyslot + 2;
 
-				// move empty slot down the list
-				for(; i<lastslot; i=2*i+2)
+				// Move empty slot down the list.
+				for (; i < lastslot; i = 2 * i + 2)
 				{
-					if(comparer.Compare(entries[i], entries[i-1])==1) i--;
-					entries[emptyslot]=entries[i];
-					emptyslot=i;
+					if (comparer.Compare(entries[i], entries[i - 1]) == 1) i--;
+					entries[emptyslot] = entries[i];
+					emptyslot = i;
 				}
 
-				if(i==lastslot)
+				if (i == lastslot)
 				{
-					entries[emptyslot]=entries[lastslot-1];
-					emptyslot=lastslot-1;
+					entries[emptyslot] = entries[lastslot - 1];
+					emptyslot = lastslot - 1;
 				}
 
-				// re-add saved entry
-				for(i=(emptyslot-1)/2; emptyslot>0&&comparer.Compare(entries[i], entry)==1; i=(emptyslot-1)/2)
+				// Re-add saved entry.
+				for (i = (emptyslot - 1) / 2; emptyslot > 0 && comparer.Compare(entries[i], entry) == 1; i = (emptyslot - 1) / 2)
 				{
-					entries[emptyslot]=entries[i];
-					emptyslot=i;
+					entries[emptyslot] = entries[i];
+					emptyslot = i;
 				}
 
-				entries[emptyslot]=entry;
+				entries[emptyslot] = entry;
 			}
 
-			entries.RemoveAt(entries.Count-1);
+			if (entries.Count != 0) entries.RemoveAt(entries.Count - 1);
+
+			return top;
 		}
 	}
 }

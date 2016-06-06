@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace Free.Core.Collections.Generic
 {
 	/// <summary>
-	/// TODO
+	/// Represents a unchangable list of values.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[ComVisible(false)]
@@ -15,55 +15,48 @@ namespace Free.Core.Collections.Generic
 	public class ReadOnlyList<T> : IList<T>, IList, IReadOnlyList<T>
 	{
 		/// <summary>
-		/// TODO
+		/// The base list.
 		/// </summary>
 		protected IList<T> list;
 
 		/// <summary>
-		/// TODO
+		/// Initializes a new instance of the <see cref="ReadOnlyList{T}"/> class that is empty.
 		/// </summary>
 		public ReadOnlyList() { }
 
 		/// <summary>
-		/// TODO
+		/// Initializes a new instance of the <see cref="ReadOnlyList{T}"/> class that contains
+		/// elements copied from the specified <see cref="IEnumerable{T}"/>.
 		/// </summary>
-		/// <param name="collection"></param>
-		public ReadOnlyList(IEnumerable<T> collection) { list=new List<T>(collection); }
+		/// <param name="collection">The <see cref="IEnumerable{T}"/> whose elements are copied to the new <see cref="ReadOnlyList{T}"/>.</param>
+		public ReadOnlyList(IEnumerable<T> collection) { list = new List<T>(collection); }
 
 		/// <summary>
-		/// TODO
+		/// Initializes a new instance of the <see cref="ReadOnlyList{T}"/> class that contains
+		/// elements copied from the specified arguments.
 		/// </summary>
-		/// <param name="collection"></param>
-		public ReadOnlyList(params T[] collection) { list=new List<T>(collection); }
+		/// <param name="collection">The elements for the new <see cref="ReadOnlyList{T}"/>.</param>
+		public ReadOnlyList(params T[] collection) { list = new List<T>(collection); }
 
 		void ThrowReadOnly() { throw new NotSupportedException("Collection is read-only."); }
 
 		#region Implements IList<T>
 		/// <summary>
-		/// TODO
+		/// Determines the index of a specific item in the <see cref="ReadOnlyList{T}"/>.
 		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
+		/// <param name="item">The object to locate in the <see cref="ReadOnlyList{T}"/>.</param>
+		/// <returns>The index of <paramref name="item"/> if found in the list; otherwise, -1.</returns>
 		public int IndexOf(T item) { return list.IndexOf(item); }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="index"></param>
-		/// <param name="item"></param>
-		public void Insert(int index, T item) { ThrowReadOnly(); }
+		void IList<T>.Insert(int index, T item) { ThrowReadOnly(); }
+
+		void IList<T>.RemoveAt(int index) { ThrowReadOnly(); }
 
 		/// <summary>
-		/// TODO
+		/// Gets the element at the specified index. Throws exception when used to set a value.
 		/// </summary>
-		/// <param name="index"></param>
-		public void RemoveAt(int index) { ThrowReadOnly(); }
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
+		/// <param name="index">The zero-based index of the element to get.</param>
+		/// <returns>The element at the specified index.</returns>
 		public T this[int index]
 		{
 			get { return list[index]; }
@@ -72,59 +65,35 @@ namespace Free.Core.Collections.Generic
 		#endregion
 
 		#region Implements ICollection<T>
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="item"></param>
-		public void Add(T item) { ThrowReadOnly(); }
+		void ICollection<T>.Add(T item) { ThrowReadOnly(); }
+
+		void ICollection<T>.Clear() { ThrowReadOnly(); }
 
 		/// <summary>
-		/// TODO
+		/// Determines whether the <see cref="ReadOnlyList{T}"/> contains a specific value.
 		/// </summary>
-		public void Clear() { ThrowReadOnly(); }
-
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
+		/// <param name="item">The object to locate in the <see cref="ReadOnlyList{T}"/>.</param>
+		/// <returns><b>true</b> if item is found in the <see cref="ReadOnlyList{T}"/>; otherwise, <b>false</b>.</returns>
 		public bool Contains(T item) { return list.Contains(item); }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="array"></param>
-		/// <param name="arrayIndex"></param>
-		public void CopyTo(T[] array, int arrayIndex) { list.CopyTo(array, arrayIndex); }
+		void ICollection<T>.CopyTo(T[] array, int arrayIndex) { list.CopyTo(array, arrayIndex); }
 
 		/// <summary>
-		/// TODO
+		/// Gets the number of elements contained in the <see cref="ReadOnlyList{T}"/>.
 		/// </summary>
 		public int Count { get { return list.Count; } }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public bool IsReadOnly { get { return true; } }
+		bool ICollection<T>.IsReadOnly { get { return true; } }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public bool Remove(T item)
+		bool ICollection<T>.Remove(T item)
 		{
 			ThrowReadOnly();
-			return false; // to silence the compiler
+			return false; // To silence the compiler.
 		}
 		#endregion
 
 		#region IEnumerable/<T>
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerator<T> GetEnumerator() { return list.GetEnumerator(); }
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() { return list.GetEnumerator(); }
 
 		IEnumerator IEnumerable.GetEnumerator() { return list.GetEnumerator(); }
 		#endregion
@@ -133,31 +102,34 @@ namespace Free.Core.Collections.Generic
 		int IList.Add(object value)
 		{
 			ThrowReadOnly();
-			return -1; // to silence the compiler
+			return -1; // To silence the compiler.
 		}
+
+		void IList.Clear() { ThrowReadOnly(); }
 
 		bool IList.Contains(object value)
 		{
-			if(value is T) return list.Contains((T)value);
-			if(value==null&&default(T)==null) return list.Contains((T)value);
+			if (value is T) return list.Contains((T)value);
+			if (value == null && default(T) == null) return list.Contains((T)value);
 			return false;
 		}
 
 		int IList.IndexOf(object value)
 		{
-			if(value is T) return list.IndexOf((T)value);
-			if(value==null&&default(T)==null) return list.IndexOf((T)value);
+			if (value is T) return list.IndexOf((T)value);
+			if (value == null && default(T) == null) return list.IndexOf((T)value);
 			return -1;
 		}
 
 		void IList.Insert(int index, object value) { ThrowReadOnly(); }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public bool IsFixedSize { get { return true; } }
+		bool IList.IsFixedSize { get { return true; } }
+
+		bool IList.IsReadOnly { get { return true; } }
 
 		void IList.Remove(object value) { ThrowReadOnly(); }
+
+		void IList.RemoveAt(int index) { ThrowReadOnly(); }
 
 		object IList.this[int index]
 		{
@@ -169,15 +141,9 @@ namespace Free.Core.Collections.Generic
 		#region ICollection
 		void ICollection.CopyTo(Array array, int index) { ((ICollection)list).CopyTo(array, index); }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public bool IsSynchronized { get { return false; } }
+		bool ICollection.IsSynchronized { get { return false; } }
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		public object SyncRoot { get { return ((ICollection)list).SyncRoot; } }
+		object ICollection.SyncRoot { get { return ((ICollection)list).SyncRoot; } }
 		#endregion
 	}
 }

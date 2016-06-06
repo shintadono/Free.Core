@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Free.Core.Collections.Generic
 {
 	/// <summary>
-	/// TODO
+	/// Represents a set of values, that isn't limited by the 2 GigaByte array limit.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">The type of elements in the hash set.</typeparam>
+	[DebuggerDisplay("Count = {Count}")]
+	[CLSCompliant(false)]
 	public class LongHashSet<T> : IEnumerable<T>
 	{
-		private List<HashSet<T>> blocks;
-		private static ulong maximumBlockLength=1<<26;
+		List<HashSet<T>> blocks;
+		static ulong maximumBlockLength=1<<26;
 
 		/// <summary>
-		/// TODO
+		/// Initializes a new instance of the <see cref="LongHashSet{T}"/> class that is empty.
 		/// </summary>
 		public LongHashSet()
 		{
@@ -21,47 +25,62 @@ namespace Free.Core.Collections.Generic
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets the number of elements contained in the <see cref="LongHashSet{T}"/>.
 		/// </summary>
-		/// <param name="val"></param>
-		/// <returns></returns>
-		public bool Contains(T val)
+		public ulong Count
 		{
-			foreach(HashSet<T> block in blocks)
+			get
 			{
-				if(block.Contains(val)) return true;
+				ulong ret = 0;
+				foreach (HashSet<T> list in blocks) ret += (ulong)list.Count;
+				return ret;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether a <see cref="LongHashSet{T}"/> object contains the specified element.
+		/// </summary>
+		/// <param name="item">The element to locate in the <see cref="LongHashSet{T}"/> object.</param>
+		/// <returns><b>true</b> if the <see cref="LongHashSet{T}"/> object contains the specified element; otherwise, <b>false</b>.</returns>
+		public bool Contains(T item)
+		{
+			for(int i=0; i<blocks.Count; i++)
+			{
+				if(blocks[i].Contains(item)) return true;
 			}
 
 			return false;
 		}
 
-		private HashSet<T> LastBlock
-		{
-			get { return blocks[blocks.Count-1]; }
-		}
+		HashSet<T> LastBlock { get { return blocks[blocks.Count - 1]; } }
 
-		private ulong FreeSpaceInLastBlock()
-		{
-			return maximumBlockLength-(ulong)LastBlock.Count;
-		}
+		ulong FreeSpaceInLastBlock() { return maximumBlockLength - (ulong)LastBlock.Count; }
 
-		private void ExtendBlocks()
-		{
-			blocks.Add(new HashSet<T>());
-		}
+		void ExtendBlocks() { blocks.Add(new HashSet<T>()); }
 
 		/// <summary>
-		/// TODO
+		/// Adds the specified element to a <see cref="LongHashSet{T}"/>.
 		/// </summary>
-		/// <param name="x"></param>
-		public void Add(T x)
+		/// <param name="item">The element to add to the <see cref="LongHashSet{T}"/> object.</param>
+		/// <returns><b>true</b> if the element is added to the <see cref="LongHashSet{T}"/> object; <b>false</b> if the element is already present.</returns>
+		public bool Add(T item)
 		{
-			if(FreeSpaceInLastBlock()==0) ExtendBlocks();
-			LastBlock.Add(x);
+			for (int i = 0; i < blocks.Count - 1; i++)
+			{
+				if (blocks[i].Contains(item)) return true;
+			}
+
+			if (FreeSpaceInLastBlock() == 0)
+			{
+				if (blocks[blocks.Count - 1].Contains(item)) return true;
+				ExtendBlocks();
+			}
+
+			return LastBlock.Add(item);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Removes all elements from a <see cref="LongHashSet{T}"/>.
 		/// </summary>
 		public void Clear()
 		{
@@ -73,25 +92,19 @@ namespace Free.Core.Collections.Generic
 		{
 			foreach(HashSet<T> block in blocks)
 			{
-				foreach(T x in block)
-				{
-					yield return x;
-				}
+				foreach(T x in block) yield return x;
 			}
 		}
 
 		/// <summary>
-		/// TODO
+		/// Returns an enumerator that iterates through a <see cref="LongHashSet{T}"/> object.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>A <see cref="IEnumerator{T}"/> for the <see cref="LongHashSet{T}"/> object.</returns>
 		public IEnumerator<T> GetEnumerator()
 		{
 			foreach(HashSet<T> block in blocks)
 			{
-				foreach(T x in block)
-				{
-					yield return x;
-				}
+				foreach(T x in block) yield return x;
 			}
 		}
 	}
