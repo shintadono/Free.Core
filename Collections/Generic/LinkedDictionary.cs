@@ -17,6 +17,8 @@ namespace Free.Core.Collections.Generic
 		const string ExpectionMessageArrayPlusOffsetTooSmall = "Array (plus offset) too small.";
 		const string ExpectionMessageArrayRankNotOne = "Array with rank not equal to one (1) is not supported.";
 		const string ExpectionMessageArrayLowerBoundNotZero = "Array with lower bound not equal to zero (0) is not supported.";
+		const string ExpectionMessageCollectionIsEmpty = "Collection is empty.";
+		const string ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty = "No element found matching the perdicate, or collection is empty.";
 
 		#region Variables
 		Dictionary<TKey, LinkedListNode<Tuple<TKey, TValue>>> dict;
@@ -348,6 +350,144 @@ namespace Free.Core.Collections.Generic
 		IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() { return new Enumerator(this, true); }
 
 		IEnumerator IEnumerable.GetEnumerator() { return new Enumerator(this, true); }
+		#endregion
+
+		#region Some LINQ operations, that should be faster than the LINQ extensions
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedDictionary{TKey, TValue}"/>.
+		/// </summary>
+		/// <returns>The first element in the <see cref="LinkedDictionary{TKey, TValue}"/>.</returns>
+		public KeyValuePair<TKey, TValue> First()
+		{
+			var first = list.First;
+			if (first == null) throw new InvalidOperationException(ExpectionMessageCollectionIsEmpty);
+			return new KeyValuePair<TKey, TValue>(first.Value.Item1, first.Value.Item2);
+		}
+
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedDictionary{TKey, TValue}"/> that satisfies a specified condition.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns>The first element in the <see cref="LinkedDictionary{TKey, TValue}"/> that passes the test in the specified <paramref name="predicate"/> function.</returns>
+		public KeyValuePair<TKey, TValue> First(Func<KeyValuePair<TKey, TValue>, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			foreach (var item in list)
+			{
+				KeyValuePair<TKey, TValue> kv = new KeyValuePair<TKey, TValue>(item.Item1, item.Item2);
+				if (predicate(kv)) return kv;
+			}
+
+			throw new InvalidOperationException(ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty);
+		}
+
+		/// <summary>
+		/// Returns the first element of a <see cref="LinkedDictionary{TKey, TValue}"/>, or a default value if the <see cref="LinkedDictionary{TKey, TValue}"/> contains no elements.
+		/// </summary>
+		/// <returns><b>default(KeyValuePair&lt;TKey, TValue&gt;)</b> if the <see cref="LinkedDictionary{TKey, TValue}"/> is empty; otherwise, the first element in the <see cref="LinkedDictionary{TKey, TValue}"/>.</returns>
+		public KeyValuePair<TKey, TValue> FirstOrDefault()
+		{
+			var first = list.First;
+			if (first == null) return default(KeyValuePair<TKey, TValue>);
+			return new KeyValuePair<TKey, TValue>(first.Value.Item1, first.Value.Item2);
+		}
+
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedDictionary{TKey, TValue}"/> that satisfies a specified condition or a default value if no such element is found.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns><b>default(KeyValuePair&lt;TKey, TValue&gt;)</b> if the <see cref="LinkedDictionary{TKey, TValue}"/> is empty or if no element passes the test specified by <paramref name="predicate"/>; otherwise, the
+		/// first element in the <see cref="LinkedDictionary{TKey, TValue}"/> that passes the test specified by <paramref name="predicate"/>.</returns>
+		public KeyValuePair<TKey, TValue> FirstOrDefault(Func<KeyValuePair<TKey, TValue>, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			foreach (var item in list)
+			{
+				KeyValuePair<TKey, TValue> kv = new KeyValuePair<TKey, TValue>(item.Item1, item.Item2);
+				if (predicate(kv)) return kv;
+			}
+
+			return default(KeyValuePair<TKey, TValue>);
+		}
+
+		/// <summary>
+		/// Returns the last element of a <see cref="LinkedDictionary{TKey, TValue}"/>.
+		/// </summary>
+		/// <returns>The last element in the <see cref="LinkedDictionary{TKey, TValue}"/>.</returns>
+		public KeyValuePair<TKey, TValue> Last()
+		{
+			var last = list.Last;
+			if (last == null) throw new InvalidOperationException(ExpectionMessageCollectionIsEmpty);
+			return new KeyValuePair<TKey, TValue>(last.Value.Item1, last.Value.Item2);
+		}
+
+		/// <summary>
+		/// Returns the last element in a <see cref="LinkedDictionary{TKey, TValue}"/> that satisfies a specified condition.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns>The last element in the <see cref="LinkedDictionary{TKey, TValue}"/> that passes the test in the specified <paramref name="predicate"/> function.</returns>
+		public KeyValuePair<TKey, TValue> Last(Func<KeyValuePair<TKey, TValue>, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			var current = list.Last;
+			while (current != null)
+			{
+				KeyValuePair<TKey, TValue> kv = new KeyValuePair<TKey, TValue>(current.Value.Item1, current.Value.Item2);
+				if (predicate(kv)) return kv;
+				current = current.Previous;
+			}
+
+			throw new InvalidOperationException(ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty);
+		}
+
+		/// <summary>
+		/// Returns the last element of a <see cref="LinkedDictionary{TKey, TValue}"/>, or a default value if the <see cref="LinkedDictionary{TKey, TValue}"/> contains no elements.
+		/// </summary>
+		/// <returns><b>default(KeyValuePair&lt;TKey, TValue&gt;)</b> if the <see cref="LinkedDictionary{TKey, TValue}"/> is empty; otherwise, the last element in the <see cref="LinkedDictionary{TKey, TValue}"/>.</returns>
+		public KeyValuePair<TKey, TValue> LastOrDefault()
+		{
+			var last = list.Last;
+			if (last == null) return default(KeyValuePair<TKey, TValue>);
+			return new KeyValuePair<TKey, TValue>(last.Value.Item1, last.Value.Item2);
+		}
+
+		/// <summary>
+		/// Returns the last element in a <see cref="LinkedDictionary{TKey, TValue}"/> that satisfies a specified condition or a default value if no such element is found.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns><b>default(KeyValuePair&lt;TKey, TValue&gt;)</b> if the <see cref="LinkedDictionary{TKey, TValue}"/> is empty or if no element passes the test specified by <paramref name="predicate"/>; otherwise, the
+		/// last element in the <see cref="LinkedDictionary{TKey, TValue}"/> that passes the test specified by <paramref name="predicate"/>.</returns>
+		public KeyValuePair<TKey, TValue> LastOrDefault(Func<KeyValuePair<TKey, TValue>, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			var current = list.Last;
+			while (current != null)
+			{
+				KeyValuePair<TKey, TValue> kv = new KeyValuePair<TKey, TValue>(current.Value.Item1, current.Value.Item2);
+				if (predicate(kv)) return kv;
+				current = current.Previous;
+			}
+
+			return default(KeyValuePair<TKey, TValue>);
+		}
+
+		/// <summary>
+		/// Returns the element of a <see cref="LinkedDictionary{TKey, TValue}"/> in reverse order.
+		/// </summary>
+		/// <returns>A sequence whose elements correspond to those of the <see cref="LinkedDictionary{TKey, TValue}"/> in reverse order.</returns>
+		public IEnumerable<KeyValuePair<TKey, TValue>> Reverse()
+		{
+			var current = list.Last;
+			while (current != null)
+			{
+				yield return new KeyValuePair<TKey, TValue>(current.Value.Item1, current.Value.Item2);
+				current = current.Previous;
+			}
+		}
 		#endregion
 
 		struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator

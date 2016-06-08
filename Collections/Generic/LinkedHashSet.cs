@@ -10,7 +10,8 @@ namespace Free.Core.Collections.Generic
 	/// <typeparam name="T">The type of elements in the hash set.</typeparam>
 	public class LinkedHashSet<T> : ISet<T>
 	{
-		const string ExpectionMessageThisShouldNotBePossible = "This should not be possible. (LinkedHashSet<T>.SymmetricExceptWith)";
+		const string ExpectionMessageCollectionIsEmpty = "Collection is empty.";
+		const string ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty = "No element found matching the perdicate, or collection is empty.";
 
 		#region Variables
 		Dictionary<T, LinkedListNode<T>> dict;
@@ -252,9 +253,6 @@ namespace Free.Core.Collections.Generic
 				Clear();
 				return;
 			}
-
-			var c = list.First;
-			if (c == null) throw new Exception(ExpectionMessageThisShouldNotBePossible);
 
 			ICollection<T> collection = other as ICollection<T>;
 			if (collection != null)
@@ -579,6 +577,140 @@ namespace Free.Core.Collections.Generic
 		public IEnumerator<T> GetEnumerator() { return list.GetEnumerator(); }
 
 		IEnumerator IEnumerable.GetEnumerator() { return list.GetEnumerator(); }
+		#endregion
+
+		#region Some LINQ operations, that should be faster than the LINQ extensions
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedHashSet{T}"/>.
+		/// </summary>
+		/// <returns>The first element in the <see cref="LinkedHashSet{T}"/>.</returns>
+		public T First()
+		{
+			var first = list.First;
+			if (first == null) throw new InvalidOperationException(ExpectionMessageCollectionIsEmpty);
+			return first.Value;
+		}
+
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedHashSet{T}"/> that satisfies a specified condition.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns>The first element in the <see cref="LinkedHashSet{T}"/> that passes the test in the specified <paramref name="predicate"/> function.</returns>
+		public T First(Func<T, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			foreach (var item in list)
+			{
+				if (predicate(item)) return item;
+			}
+
+			throw new InvalidOperationException(ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty);
+		}
+
+		/// <summary>
+		/// Returns the first element of a <see cref="LinkedHashSet{T}"/>, or a default value if the <see cref="LinkedHashSet{T}"/> contains no elements.
+		/// </summary>
+		/// <returns><b>default(T)</b> if the <see cref="LinkedHashSet{T}"/> is empty; otherwise, the first element in the <see cref="LinkedHashSet{T}"/>.</returns>
+		public T FirstOrDefault()
+		{
+			var first = list.First;
+			if (first == null) return default(T);
+			return first.Value;
+		}
+
+		/// <summary>
+		/// Returns the first element in a <see cref="LinkedHashSet{T}"/> that satisfies a specified condition or a default value if no such element is found.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns><b>default(T)</b> if the <see cref="LinkedHashSet{T}"/> is empty or if no element passes the test specified by <paramref name="predicate"/>; otherwise, the
+		/// first element in the <see cref="LinkedHashSet{T}"/> that passes the test specified by <paramref name="predicate"/>.</returns>
+		public T FirstOrDefault(Func<T, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			foreach (var item in list)
+			{
+				if (predicate(item)) return item;
+			}
+
+			return default(T);
+		}
+
+		/// <summary>
+		/// Returns the last element of a <see cref="LinkedHashSet{T}"/>.
+		/// </summary>
+		/// <returns>The last element in the <see cref="LinkedHashSet{T}"/>.</returns>
+		public T Last()
+		{
+			var last = list.Last;
+			if (last == null) throw new InvalidOperationException(ExpectionMessageCollectionIsEmpty);
+			return last.Value;
+		}
+
+		/// <summary>
+		/// Returns the last element in a <see cref="LinkedHashSet{T}"/> that satisfies a specified condition.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns>The last element in the <see cref="LinkedHashSet{T}"/> that passes the test in the specified <paramref name="predicate"/> function.</returns>
+		public T Last(Func<T, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			var current = list.Last;
+			while (current != null)
+			{
+				if (predicate(current.Value)) return current.Value;
+				current = current.Previous;
+			}
+
+			throw new InvalidOperationException(ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty);
+		}
+
+		/// <summary>
+		/// Returns the last element of a <see cref="LinkedHashSet{T}"/>, or a default value if the <see cref="LinkedHashSet{T}"/> contains no elements.
+		/// </summary>
+		/// <returns><b>default(T)</b> if the <see cref="LinkedHashSet{T}"/> is empty; otherwise, the last element in the <see cref="LinkedHashSet{T}"/>.</returns>
+		public T LastOrDefault()
+		{
+			var last = list.Last;
+			if (last == null) return default(T);
+			return last.Value;
+		}
+
+		/// <summary>
+		/// Returns the last element in a <see cref="LinkedHashSet{T}"/> that satisfies a specified condition or a default value if no such element is found.
+		/// </summary>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns><b>default(T)</b> if the <see cref="LinkedHashSet{T}"/> is empty or if no element passes the test specified by <paramref name="predicate"/>; otherwise, the
+		/// last element in the <see cref="LinkedHashSet{T}"/> that passes the test specified by <paramref name="predicate"/>.</returns>
+		public T LastOrDefault(Func<T, bool> predicate)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			var current = list.Last;
+			while (current != null)
+			{
+				if (predicate(current.Value)) return current.Value;
+				current = current.Previous;
+			}
+
+			return default(T);
+		}
+
+		/// <summary>
+		/// Returns the element of a <see cref="LinkedHashSet{T}"/> in reverse order.
+		/// </summary>
+		/// <returns>A sequence whose elements correspond to those of the <see cref="LinkedHashSet{T}"/> in reverse order.</returns>
+		public IEnumerable<T> Reverse()
+		{
+			var current = list.Last;
+			while (current != null)
+			{
+				yield return current.Value;
+				current = current.Previous;
+			}
+		}
 		#endregion
 	}
 }
