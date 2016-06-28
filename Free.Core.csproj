@@ -52,6 +52,10 @@
     <Compile Include="Collections\Bitfield.cs" />
     <Compile Include="BitOrder.cs" />
     <Compile Include="Bits.cs" />
+    <Compile Include="Collections\Generic\CachingCreator.cs" />
+    <Compile Include="Collections\Generic\DoubleLinkedRing.cs" />
+    <Compile Include="Collections\Generic\DoubleLinkedRingNode.cs" />
+    <Compile Include="Collections\Generic\IElementLookup.cs" />
     <Compile Include="Collections\Generic\LinkedHashSet.cs" />
     <Compile Include="Collections\Generic\LinkedDictionary.cs" />
     <Compile Include="Collections\Generic\ResourceRecycler.cs" />

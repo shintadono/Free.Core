@@ -824,7 +824,7 @@ namespace Free.Core.Collections.Internal
 				ConsumeBoolTrue(false);
 				result.Add(true);
 			}
-			else throw new ArgumentException("Must be either 't', 'T', 'f' or 'F'.", "c0");
+			else throw new ArgumentException("Must be either 't', 'T', 'f' or 'F'.", nameof(c0));
 
 			bool commaNext = true; // Indicates whether the next character must be a comma (ignoring the whitespaces and comments).
 			bool done = false;
@@ -916,7 +916,7 @@ namespace Free.Core.Collections.Internal
 			List<double> dList = new List<double>();
 
 			if (!(c0 == '+' || c0 == '-' || (c0 >= '0' && c0 <= '9')))
-				throw new ArgumentException("Must be either '+', '-', or between '0' and '9'.", "c0");
+				throw new ArgumentException("Must be either '+', '-', or between '0' and '9'.", nameof(c0));
 
 			StringBuilder numberSB = new StringBuilder();
 			numberSB.Append(c0);
@@ -1044,7 +1044,7 @@ namespace Free.Core.Collections.Internal
 				str = ConsumeVerbatimStringWithoutSemicolon();
 				tmp.Add(str);
 			}
-			else throw new ArgumentException("Must be either '\"' or '@'.", "c0");
+			else throw new ArgumentException("Must be either '\"' or '@'.", nameof(c0));
 
 			bool commaNext = true; // Indicates whether the next character must be a comma (ignoring the whitespaces and comments).
 			bool done = false;

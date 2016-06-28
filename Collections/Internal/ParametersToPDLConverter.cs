@@ -147,7 +147,7 @@ namespace Free.Core.Collections.Internal
 		static string DataBlobToPDL(byte[] data, bool cooked)
 		{
 			int len = data.Length;
-			if (len == 0) throw new ArgumentException("Array must not be empty.", "data");
+			if (len == 0) throw new ArgumentException("Array must not be empty.", nameof(data));
 
 			StringBuilder ret = new StringBuilder(1 + data.Length * (cooked ? 3 : 2));
 			ret.Append('#');

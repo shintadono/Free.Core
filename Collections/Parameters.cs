@@ -556,7 +556,7 @@ namespace Free.Core.Collections
 
 			// Check key
 			if(key.Length==0)
-				throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", "name");
+				throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", nameof(path));
 
 			int ind=key.IndexOf('/');
 
@@ -621,7 +621,7 @@ namespace Free.Core.Collections
 					string name2=name.Substring(0, name.Length-2);
 
 					if(!CheckName(name2))
-						throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", "name");
+						throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", nameof(name));
 
 					if(items.ContainsKey(name2))
 					{
@@ -659,7 +659,7 @@ namespace Free.Core.Collections
 								List<Parameters> list=(List<Parameters>)ilist;
 								list.Add((Parameters)val);
 							}
-							else throw new ArgumentException("Must be of the same type as the typed list to be added to the list.", "val");
+							else throw new ArgumentException("Must be of the same type as the typed list to be added to the list.", nameof(val));
 
 							return;
 						}
@@ -698,12 +698,12 @@ namespace Free.Core.Collections
 						list.Add((Parameters)val);
 						items.Add(name2, list);
 					}
-					else throw new ArgumentException("Must be a type of a typed list to be added to a list.", "val");
+					else throw new ArgumentException("Must be a type of a typed list to be added to a list.", nameof(val));
 				}
 				else // not a list
 				{
 					if(!CheckName(name))
-						throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", "name");
+						throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", nameof(name));
 
 					if(items.ContainsKey(name)) items.Remove(name);
 					items.Add(name, val);
@@ -714,7 +714,7 @@ namespace Free.Core.Collections
 			{
 				#region [index]
 				if(!CheckName(listname))
-					throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", "name");
+					throw new ArgumentException("Must begin with an alpha-char, a dollar-sign or an understroke, afterwards digits are allowed too.", nameof(name));
 
 				if(items.ContainsKey(listname))
 				{
@@ -762,7 +762,7 @@ namespace Free.Core.Collections
 							if(idx<list.Count) list[idx]=(Parameters)val;
 							else list.Add((Parameters)val);
 						}
-						else throw new ArgumentException("Must be of the same type as the typed list to be added to the list.", "val");
+						else throw new ArgumentException("Must be of the same type as the typed list to be added to the list.", nameof(val));
 
 						return;
 					}
@@ -804,7 +804,7 @@ namespace Free.Core.Collections
 					list.Add((Parameters)val);
 					items.Add(listname, list);
 				}
-				else throw new ArgumentException("Must be a type of a typed list to be added to a list.", "val");
+				else throw new ArgumentException("Must be a type of a typed list to be added to a list.", nameof(val));
 
 				#endregion
 			}

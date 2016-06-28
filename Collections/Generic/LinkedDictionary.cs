@@ -9,7 +9,7 @@ namespace Free.Core.Collections.Generic
 	/// </summary>
 	/// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
 	/// <typeparam name="TValue">The type of the keys in the dictionary.</typeparam>
-	public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>, IDictionary
+	public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>, IDictionary, IElementLookup<TKey, TValue>
 	{
 		const string ExpectionMessageCollectionIsReadOnly = "Collection is read only.";
 		const string ExpectionMessageWrongType = "Wrong type.";
@@ -207,7 +207,7 @@ namespace Free.Core.Collections.Generic
 		{
 			if (array == null) throw new ArgumentNullException(nameof(array));
 			if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-			if (array.Length - arrayIndex < Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+			if (array.Length - arrayIndex < Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 			int offset = arrayIndex;
 			foreach (var keyValue in list) array[offset++] = new KeyValuePair<TKey, TValue>(keyValue.Item1, keyValue.Item2);
@@ -319,10 +319,10 @@ namespace Free.Core.Collections.Generic
 		void ICollection.CopyTo(Array array, int arrayIndex)
 		{
 			if (array == null) throw new ArgumentNullException(nameof(array));
-			if (array.Rank != 1) throw new ArgumentException(nameof(array), ExpectionMessageArrayRankNotOne);
-			if (array.GetLowerBound(0) != 0) throw new ArgumentException(nameof(array), ExpectionMessageArrayLowerBoundNotZero);
+			if (array.Rank != 1) throw new ArgumentException(ExpectionMessageArrayRankNotOne, nameof(array));
+			if (array.GetLowerBound(0) != 0) throw new ArgumentException(ExpectionMessageArrayLowerBoundNotZero, nameof(array));
 			if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-			if (array.Length - arrayIndex < Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+			if (array.Length - arrayIndex < Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 			KeyValuePair<TKey, TValue>[] values = array as KeyValuePair<TKey, TValue>[];
 			if (values != null)
@@ -332,7 +332,7 @@ namespace Free.Core.Collections.Generic
 			}
 
 			object[] objects = array as object[];
-			if (objects == null) throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+			if (objects == null) throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 
 			int offset = arrayIndex;
 			try
@@ -341,7 +341,7 @@ namespace Free.Core.Collections.Generic
 			}
 			catch (ArrayTypeMismatchException)
 			{
-				throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+				throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 			}
 		}
 		#endregion
@@ -610,7 +610,7 @@ namespace Free.Core.Collections.Generic
 			{
 				if (array == null) throw new ArgumentNullException(nameof(array));
 				if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 				int offset = arrayIndex;
 				foreach (var keyValue in linkedDictionary.list) array[offset++] = keyValue.Item1;
@@ -621,10 +621,10 @@ namespace Free.Core.Collections.Generic
 			void ICollection.CopyTo(Array array, int arrayIndex)
 			{
 				if (array == null) throw new ArgumentNullException(nameof(array));
-				if (array.Rank != 1) throw new ArgumentException(nameof(array), ExpectionMessageArrayRankNotOne);
-				if (array.GetLowerBound(0) != 0) throw new ArgumentException(nameof(array), ExpectionMessageArrayLowerBoundNotZero);
+				if (array.Rank != 1) throw new ArgumentException(ExpectionMessageArrayRankNotOne, nameof(array));
+				if (array.GetLowerBound(0) != 0) throw new ArgumentException(ExpectionMessageArrayLowerBoundNotZero, nameof(array));
 				if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 				TKey[] values = array as TKey[];
 				if (values != null)
@@ -634,7 +634,7 @@ namespace Free.Core.Collections.Generic
 				}
 
 				object[] objects = array as object[];
-				if (objects == null) throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+				if (objects == null) throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 
 				int offset = arrayIndex;
 				try
@@ -643,7 +643,7 @@ namespace Free.Core.Collections.Generic
 				}
 				catch (ArrayTypeMismatchException)
 				{
-					throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+					throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 				}
 			}
 
@@ -695,7 +695,7 @@ namespace Free.Core.Collections.Generic
 			{
 				if (array == null) throw new ArgumentNullException(nameof(array));
 				if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 				int offset = arrayIndex;
 				foreach (var keyValue in linkedDictionary.list) array[offset++] = keyValue.Item2;
@@ -706,10 +706,10 @@ namespace Free.Core.Collections.Generic
 			void ICollection.CopyTo(Array array, int arrayIndex)
 			{
 				if (array == null) throw new ArgumentNullException(nameof(array));
-				if (array.Rank != 1) throw new ArgumentException(nameof(array), ExpectionMessageArrayRankNotOne);
-				if (array.GetLowerBound(0) != 0) throw new ArgumentException(nameof(array), ExpectionMessageArrayLowerBoundNotZero);
+				if (array.Rank != 1) throw new ArgumentException(ExpectionMessageArrayRankNotOne, nameof(array));
+				if (array.GetLowerBound(0) != 0) throw new ArgumentException(ExpectionMessageArrayLowerBoundNotZero, nameof(array));
 				if (arrayIndex < 0 || arrayIndex >= array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(nameof(array), ExpectionMessageArrayPlusOffsetTooSmall);
+				if (array.Length - arrayIndex < linkedDictionary.Count) throw new ArgumentException(ExpectionMessageArrayPlusOffsetTooSmall, nameof(array));
 
 				TValue[] values = array as TValue[];
 				if (values != null)
@@ -719,7 +719,7 @@ namespace Free.Core.Collections.Generic
 				}
 
 				object[] objects = array as object[];
-				if (objects == null) throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+				if (objects == null) throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 
 				int offset = arrayIndex;
 				try
@@ -728,7 +728,7 @@ namespace Free.Core.Collections.Generic
 				}
 				catch (ArrayTypeMismatchException)
 				{
-					throw new ArgumentException(nameof(array), ExpectionMessageInvalidArrayType);
+					throw new ArgumentException(ExpectionMessageInvalidArrayType, nameof(array));
 				}
 			}
 

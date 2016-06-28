@@ -8,7 +8,7 @@ namespace Free.Core.Collections.Generic
 	/// Represents a set of values, with predictable iteration order.
 	/// </summary>
 	/// <typeparam name="T">The type of elements in the hash set.</typeparam>
-	public class LinkedHashSet<T> : ISet<T>
+	public class LinkedHashSet<T> : ISet<T>, IElementLookup<T, T>
 	{
 		const string ExpectionMessageCollectionIsEmpty = "Collection is empty.";
 		const string ExpectionMessageNoElementFoundMatchingThePredicateOrCollectionIsEmpty = "No element found matching the perdicate, or collection is empty.";
@@ -107,6 +107,31 @@ namespace Free.Core.Collections.Generic
 			list.Remove(node);
 			return true;
 		}
+
+		/// <summary>
+		/// Retrieves a value from the <see cref="LinkedHashSet{T}"/>, or adds it to the <see cref="LinkedHashSet{T}"/>.
+		/// </summary>
+		/// <param name="item">The value for which to get the store element, or the value to add.</param>
+		/// <returns>The store element if found; otherwise, <paramref name="item"/>.</returns>
+		public T GetOrAdd(T item)
+		{
+			LinkedListNode<T> node;
+			if (!dict.TryGetValue(item, out node))
+			{
+				node = list.AddLast(item);
+				dict.Add(item, node);
+				return item;
+			}
+
+			return node.Value;
+		}
+
+		/// <summary>
+		/// Retrieves a value from the <see cref="LinkedHashSet{T}"/>, or adds it to the <see cref="LinkedHashSet{T}"/>.
+		/// </summary>
+		/// <param name="item">The value for which to get the store element, or the value to add.</param>
+		/// <returns>The store element if found; otherwise, <paramref name="item"/>.</returns>
+		public T this[T item] { get { return GetOrAdd(item); } }
 
 		#region Implements ISet<T>
 		/// <summary>

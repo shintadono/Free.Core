@@ -11,7 +11,7 @@ namespace Free.Core.Collections.Generic
 	public class ResourceRecycler<K, T> where K : class
 	{
 		/// <summary>
-		/// The cache tile informations.
+		/// The cache element.
 		/// </summary>
 		class Entry
 		{
@@ -103,8 +103,8 @@ namespace Free.Core.Collections.Generic
 		/// <param name="resources">The resources to initialise the cache with.</param>
 		public void Init(T[] resources)
 		{
-			if (resources == null) throw new ArgumentNullException("resources");
-			if (resources.Length == 0) throw new ArgumentException("Must not be empty.", "resources");
+			if (resources == null) throw new ArgumentNullException(nameof(resources));
+			if (resources.Length == 0) throw new ArgumentException("Must not be empty.", nameof(resources));
 
 			Clear();
 
