@@ -55,6 +55,9 @@
     <Compile Include="Collections\Generic\CachingCreator.cs" />
     <Compile Include="Collections\Generic\DoubleLinkedRing.cs" />
     <Compile Include="Collections\Generic\DoubleLinkedRingNode.cs" />
+    <Compile Include="Collections\Generic\Extensions\ListExtensions.cs" />
+    <Compile Include="Collections\Generic\Extensions\ListOfICopyExtensions.cs" />
+    <Compile Include="Collections\Generic\Extensions\ListOfStructExtensions.cs" />
     <Compile Include="Collections\Generic\IElementLookup.cs" />
     <Compile Include="Collections\Generic\LinkedHashSet.cs" />
     <Compile Include="Collections\Generic\LinkedDictionary.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="Exceptions\TextParserException.cs" />
     <Compile Include="Extensions\CharExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Generic\ICopy.cs" />
     <Compile Include="IO\BufferedBinaryReader.cs" />
     <Compile Include="ByteOrder.cs" />
     <Compile Include="Extensions\IntegerArithmeticsExtensions.cs" />
