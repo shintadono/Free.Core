@@ -1705,6 +1705,7 @@ namespace Free.Core.Collections
 		/// <returns><b>true</b> if the current object is equal to the other parameter; otherwise, <b>false</b>.</returns>
 		public bool Equals(Parameters other)
 		{
+			if (ReferenceEquals(other, null)) return false;
 			if (Count != other.Count) return false;
 
 			foreach (string key in items.Keys)
