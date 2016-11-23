@@ -10,7 +10,7 @@ namespace Free.Core.Collections.Generic.Extensions
 	public static class ListOfICopyExtensions
 	{
 		/// <summary>
-		/// Creates an deep clone of a <see cref="List{T}"/>.
+		/// Creates a deep clone of a <see cref="List{T}"/>.
 		/// </summary>
 		/// <typeparam name="T">The type of the elements. Must be a <b>class</b> and derived from <see cref="ICopy{T}"/>.</typeparam>
 		/// <param name="list">The list to copy.</param>
