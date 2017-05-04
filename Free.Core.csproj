@@ -64,6 +64,23 @@
     <Compile Include="Collections\Generic\ResourceRecycler.cs" />
     <Compile Include="Collections\Internal\PDLParser.cs" />
     <Compile Include="Collections\Internal\ParametersToPDLConverter.cs" />
+    <Compile Include="Drawing\ChannelType.cs" />
+    <Compile Include="Drawing\ChunkedFloatImage.cs" />
+    <Compile Include="Drawing\ChunkedImage.cs" />
+    <Compile Include="Drawing\ChunkedImage16.cs" />
+    <Compile Include="Drawing\DrawBlendMode.cs" />
+    <Compile Include="Drawing\FloatImage.cs" />
+    <Compile Include="Drawing\Image16.cs" />
+    <Compile Include="Drawing\ImageCommons.cs" />
+    <Compile Include="Drawing\PlanarConfiguration.cs" />
+    <Compile Include="Drawing\Raster.cs" />
+    <Compile Include="Drawing\ChunkedImage8.cs" />
+    <Compile Include="Drawing\TiledFloatImage.cs" />
+    <Compile Include="Drawing\TiledImage16.cs" />
+    <Compile Include="Drawing\TiledImage8.cs" />
+    <Compile Include="Drawing\Image8.cs" />
+    <Compile Include="Drawing\StorageLayout.cs" />
+    <Compile Include="Drawing\TiledImage.cs" />
     <Compile Include="Exceptions\TextParserException.cs" />
     <Compile Include="Extensions\CharExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -93,6 +110,7 @@
     <None Include="README.md" />
     <None Include="StrongNameKey.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
