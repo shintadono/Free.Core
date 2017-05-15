@@ -191,7 +191,7 @@ namespace Free.Core.Drawing
 
 			Width = width;
 			Height = height;
-			TileWidth = TileWidth;
+			TileWidth = tileWidth;
 			TileHeight = tileHeight;
 
 			NumberOfTileX = (width + tileWidth - 1) / tileWidth;
