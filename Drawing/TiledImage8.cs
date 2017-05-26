@@ -234,12 +234,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="init">Indicates whether the <see cref="Bits"/> array shall be created and initialize with zeros (0).</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage8(int width, int height, bool RGB, bool extraChannel, bool init, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously)
@@ -277,12 +277,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance with a specified color.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="initColor">The initial color. ( Layout: [I] or [R] [G] [B] (/[X]) )</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage8(int width, int height, bool RGB, bool extraChannel, byte[] initColor, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously) :
@@ -294,12 +294,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance with a specified color.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="initColor">The initial color. (Layout: 0xXXRRGGBB)</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage8(int width, int height, bool RGB, bool extraChannel, int initColor = 0, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously) :
@@ -471,7 +471,7 @@ namespace Free.Core.Drawing
 		/// </summary>
 		/// <param name="x">The x position of the <paramref name="source"/> image in this image.</param>
 		/// <param name="y">The y position of the <paramref name="source"/> image in this image.</param>
-		/// <param name="source">The image the draw.</param>
+		/// <param name="source">The image to draw.</param>
 		/// <param name="blendMode">The blend mode.</param>
 		public void Draw(int x, int y, TiledImage8 source, DrawBlendMode blendMode = DrawBlendMode.Overwrite)
 		{
@@ -947,29 +947,6 @@ namespace Free.Core.Drawing
 		}
 
 		/// <summary>
-		/// Gets a sub-image at the specified position with the specified size. The new image has the same <see cref="PlanarConfiguration"/> and type (<see cref="Image8"/>, <see cref="ChunkedImage8"/>,
-		/// or <see cref="TiledImage8"/>) as the original. Requested areas outside the image will be filled with the default values
-		/// </summary>
-		/// <param name="x">The x-position of the sub-image in the image.</param>
-		/// <param name="y">The y-position of the sub-image in the image.</param>
-		/// <param name="width">The width of the new image.</param>
-		/// <param name="height">The height of the new image.</param>
-		/// <returns>The sub-image.</returns>
-		public TiledImage8 GetSubImage(int x, int y, int width, int height)
-		{
-			// Create the result depending on this.
-			TiledImage8 ret = null;
-			if (this is Image8) ret = new Image8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, PlanarConfiguration);
-			else if (this is ChunkedImage8) ret = new ChunkedImage8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, ((ChunkedImage8)this).ChunkHeight, PlanarConfiguration);
-			else ret = new TiledImage8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, TileWidth, TileHeight, PlanarConfiguration);
-
-			// Just draw this into the result image, and let Draw handle everything.
-			ret.Draw(-x, -y, this);
-
-			return ret;
-		}
-
-		/// <summary>
 		/// Gets an image without the extra channel. If the image doesn't have an extra channel in the first place, the image itself is returned.
 		/// If a new image is returned sizes, <see cref="PlanarConfiguration"/> and type (<see cref="Image8"/>, <see cref="ChunkedImage8"/>,
 		/// or <see cref="TiledImage8"/>) is maintained.
@@ -1013,6 +990,29 @@ namespace Free.Core.Drawing
 					srcTile++; // Skip extra channel.
 				}
 			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Gets a sub-image at the specified position with the specified size. The new image has the same <see cref="PlanarConfiguration"/> and type (<see cref="Image8"/>, <see cref="ChunkedImage8"/>,
+		/// or <see cref="TiledImage8"/>) as the original. Requested areas outside the image will be filled with the default values.
+		/// </summary>
+		/// <param name="x">The x-position of the sub-image in the image.</param>
+		/// <param name="y">The y-position of the sub-image in the image.</param>
+		/// <param name="width">The width of the new image.</param>
+		/// <param name="height">The height of the new image.</param>
+		/// <returns>The sub-image.</returns>
+		public TiledImage8 GetSubImage(int x, int y, int width, int height)
+		{
+			// Create the result depending on this.
+			TiledImage8 ret = null;
+			if (this is Image8) ret = new Image8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, PlanarConfiguration);
+			else if (this is ChunkedImage8) ret = new ChunkedImage8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, ((ChunkedImage8)this).ChunkHeight, PlanarConfiguration);
+			else ret = new TiledImage8(width, height, NumberOfChannels >= 3, NumberOfChannels > 3, true, TileWidth, TileHeight, PlanarConfiguration);
+
+			// Just draw this into the result image, and let Draw handle everything.
+			ret.Draw(-x, -y, this);
 
 			return ret;
 		}

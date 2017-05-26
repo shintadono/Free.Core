@@ -235,12 +235,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="init">Indicates whether the <see cref="Bits"/> array shall be created and initialize with zeros (0).</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage16(int width, int height, bool RGB, bool extraChannel, bool init, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously)
@@ -278,12 +278,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance with a specified color.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="initColor">The initial color. ( Layout: [I] or [R] [G] [B] (/[X]) )</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage16(int width, int height, bool RGB, bool extraChannel, ushort[] initColor, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously) :
@@ -295,12 +295,12 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Creates a new instance with a specified color.
 		/// </summary>
-		/// <param name="width">The width of the image in pixels. Must be greater zero (0)</param>
-		/// <param name="height">The height of the image in pixels. Must be greater zero (0)</param>
+		/// <param name="width">The width of the image in pixels. Must be greater zero (0).</param>
+		/// <param name="height">The height of the image in pixels. Must be greater zero (0).</param>
 		/// <param name="RGB">Indicates whether the image shall be RGB or single-channeled.</param>
 		/// <param name="extraChannel">Indicates whether a RGB image shall contain an extra channel, e.g. for alpha. Must be <b>false</b> if <paramref name="RGB"/> is <b>false</b>.</param>
 		/// <param name="initColor">The initial color. (Layout: 0xXXXXRRRRGGGGBBBB)</param>
-		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0)</param>
+		/// <param name="tileWidth">The width of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="tileHeight">The height of the tiles in pixels. Must be greater zero (0).</param>
 		/// <param name="planarConfig">The planar configuration to use. Single-channel images must be continuously.</param>
 		public TiledImage16(int width, int height, bool RGB, bool extraChannel, long initColor = 0, int tileWidth = 256, int tileHeight = 256, PlanarConfiguration planarConfig = PlanarConfiguration.Continuously) :
@@ -472,7 +472,7 @@ namespace Free.Core.Drawing
 		/// </summary>
 		/// <param name="x">The x position of the <paramref name="source"/> image in this image.</param>
 		/// <param name="y">The y position of the <paramref name="source"/> image in this image.</param>
-		/// <param name="source">The image the draw.</param>
+		/// <param name="source">The image to draw.</param>
 		/// <param name="blendMode">The blend mode.</param>
 		public void Draw(int x, int y, TiledImage16 source, DrawBlendMode blendMode = DrawBlendMode.Overwrite)
 		{
@@ -997,7 +997,7 @@ namespace Free.Core.Drawing
 
 		/// <summary>
 		/// Gets a sub-image at the specified position with the specified size. The new image has the same <see cref="PlanarConfiguration"/> and type (<see cref="Image16"/>, <see cref="ChunkedImage16"/>,
-		/// or <see cref="TiledImage16"/>) as the original. Requested areas outside the image will be filled with the default values
+		/// or <see cref="TiledImage16"/>) as the original. Requested areas outside the image will be filled with the default values.
 		/// </summary>
 		/// <param name="x">The x-position of the sub-image in the image.</param>
 		/// <param name="y">The y-position of the sub-image in the image.</param>
