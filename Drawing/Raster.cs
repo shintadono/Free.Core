@@ -558,7 +558,7 @@ namespace Free.Core.Drawing
 
 				Parallel.For(0, amountY, line =>
 				{
-					bool fast = line > dist && line < tileHeight - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
 
 					var index = line * tileWidth;
 
@@ -567,7 +567,7 @@ namespace Free.Core.Drawing
 					for (int samp = 0; samp < amountX; samp++, index++)
 					{
 						bool found = false;
-						if (fast && samp > dist && samp < tileWidth - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
 						{
 							for (int i = 0; i < nitio.Length; i++)
 							{
@@ -660,7 +660,7 @@ namespace Free.Core.Drawing
 
 				Parallel.For(0, amountY, line =>
 				{
-					bool fast = line > dist && line < tileHeight - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
 
 					var index = line * tileWidth;
 
@@ -668,7 +668,7 @@ namespace Free.Core.Drawing
 
 					for (int samp = 0; samp < amountX; samp++, index++)
 					{
-						if (fast && samp > dist && samp < tileWidth - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
 						{
 							for (int i = 0; i < nitio.Length; i++)
 							{
