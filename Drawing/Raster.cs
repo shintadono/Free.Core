@@ -734,6 +734,104 @@ namespace Free.Core.Drawing
 		}
 		#endregion
 
+		#region Filter
+		/// <summary>
+		/// Performs a <paramref name="filterOperation"/> on a <see cref="Raster{T}"/>.
+		/// </summary>
+		/// <param name="filterOperation">The function to calculate the result value for a structure element.</param>
+		/// <param name="radius">The radius.</param>
+		/// <param name="borderValue">The value to be given to the <paramref name="filterOperation"/> for elements outside of the raster.</param>
+		/// <returns>The raster with the filtered values.</returns>
+		public Raster<A> Filter<A>(Func<T[], A> filterOperation, double radius, T borderValue) where A : struct, IEquatable<A>
+		{
+			int maxDistance;
+			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
+			var neighbouresInTileIndexOffsets = ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth);
+
+			return Filter(filterOperation, maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets, borderValue);
+		}
+
+		/// <summary>
+		/// Performs a <paramref name="filterOperation"/> on a <see cref="Raster{T}"/>.
+		/// </summary>
+		/// <param name="filterOperation">The function to calculate the result value for a structure element.</param>
+		/// <param name="maxDistance">Distance of the furthest 'structuring elements' in one dimension from the current position [in number of cells].</param>
+		/// <param name="neighbouresInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
+		/// <param name="neighbouresXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
+		/// <param name="borderValue">The value to be given to the <paramref name="filterOperation"/> for elements outside of the raster.</param>
+		/// <returns>The raster with the filtered values.</returns>
+		public Raster<A> Filter<A>(Func<T[], A> filterOperation, int maxDistance, int[] neighbouresInTileIndexOffsets, int[] neighbouresXYOffsets, T borderValue) where A : struct, IEquatable<A>
+		{
+			if (maxDistance <= 0) throw new ArgumentException("Must be greater than zero(0).", nameof(maxDistance));
+			if (null == neighbouresInTileIndexOffsets) throw new ArgumentNullException(nameof(neighbouresInTileIndexOffsets));
+			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
+			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
+			if (neighbouresXYOffsets.Length / 2 != neighbouresInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighbouresInTileIndexOffsets) + ".", nameof(neighbouresXYOffsets));
+
+			// Local copies are faster.
+			var dist = maxDistance;
+			int[] nitio = neighbouresInTileIndexOffsets, nxyo = neighbouresXYOffsets;
+			int width = Width, height = Height, tileWidth = TileWidth, tileHeight = TileHeight, numberOfTileX = NumberOfTileX;
+			var orgData = Data;
+
+			var ret = new Raster<A>(width, height, true, tileWidth, tileHeight);
+			var retData = ret.Data;
+
+			// Let's do it by tile to keep the data accesses local.
+			for (int tile = 0; tile < retData.Length; tile++)
+			{
+				var retTile = retData[tile];
+				var orgTile = orgData[tile]; // Used for fast access path only.
+
+				var tileStartX = tileWidth * (tile % numberOfTileX);
+				var tileStartY = tileHeight * (tile / numberOfTileX);
+
+				var amountX = Math.Min(width - tileStartX, tileWidth);
+				var amountY = Math.Min(height - tileStartY, tileHeight);
+
+				Parallel.For(0, amountY, line =>
+				{
+					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+
+					var index = line * tileWidth;
+
+					var rasterLine = line + tileStartY;
+
+					T[] structurElement = new T[nitio.Length];
+
+					for (int samp = 0; samp < amountX; samp++, index++)
+					{
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						{
+							for (int i = 0; i < nitio.Length; i++) structurElement[i] = orgTile[index + nitio[i]];
+						}
+						else
+						{
+							var rasterSamp = samp + tileStartX;
+							for (int i = 0, a = 0; i < nxyo.Length; a++)
+							{
+								var x = rasterSamp + nxyo[i++]; // First read the x value...
+								var y = rasterLine + nxyo[i++]; // ...then the y value.
+								if (x < 0 || x >= width || y < 0 || y >= height)
+								{
+									structurElement[a] = borderValue;
+									continue;
+								}
+
+								int xTile = x / tileWidth, yTile = y / tileHeight, xInTile = x % tileWidth, yInTile = y % tileHeight;
+
+								structurElement[a] = Data[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile];
+							}
+						}
+
+						retTile[index] = filterOperation(structurElement);
+					}
+				});
+			}
+			return ret;
+		}
+		#endregion
+
 		#region Implements TiledImage
 		TiledImage TiledImage.GetTile(int x, int y)
 		{
