@@ -185,6 +185,80 @@ namespace Free.Core.Drawing
 
 		#endregion
 
+		#region Statics
+		/// <summary>
+		/// Caches the neighbouresXYOffsets and maxDistance values for previous requested radii.
+		/// </summary>
+		public static Dictionary<double, Tuple<int, int[]>> NeighbouresXYOffsetsCache = new Dictionary<double, Tuple<int, int[]>>();
+
+		/// <summary>
+		/// Generates the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.
+		/// </summary>
+		/// <param name="radius">The radius.</param>
+		/// <param name="maxDistance">The maximum integral distance in x or y dimension of a lattice point to the center.</param>
+		/// <returns>An array containing the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.</returns>
+		public static int[] GenerateNeighbouresXYOffsets(double radius, out int maxDistance)
+		{
+			if (double.IsInfinity(radius) || double.IsNaN(radius)) throw new ArgumentException("Must be a valid, non-infinte number.", nameof(radius));
+
+			// Let's check the cache, whether we already calculated maxDistance and array for the given radius.
+			Tuple<int, int[]> cached;
+			if (NeighbouresXYOffsetsCache.TryGetValue(radius, out cached))
+			{
+				maxDistance = cached.Item1;
+				return cached.Item2;
+			}
+
+			// We could throw here, but that seems to be overkill, since we can fix this.
+			double radiusAbs = Math.Abs(radius);
+			if (radiusAbs < 1) radiusAbs = 1;
+
+			int rad = (int)Math.Floor(radiusAbs);
+
+			var ret = new List<int>();
+			for (var y = -rad; y <= rad; y++)
+			{
+				for (var x = -rad; x <= rad; x++)
+				{
+					if (y * y + x * x > radiusAbs * radiusAbs) continue;
+					ret.Add(x);
+					ret.Add(y);
+				}
+			}
+
+			int[] retArray = ret.ToArray();
+			lock (NeighbouresXYOffsetsCache)
+			{
+				NeighbouresXYOffsetsCache[radius] = new Tuple<int, int[]>(rad, retArray);
+			}
+
+			maxDistance = rad;
+			return retArray;
+		}
+
+		/// <summary>
+		/// Converts the alternating relative x- and y-coordinate values into index offsets for a specified <paramref name="tileWidth"/>.
+		/// </summary>
+		/// <param name="neighbouresXYOffsets">The array with alternating relative x- and y-coordinate values.</param>
+		/// <param name="tileWidth">The tile width.</param>
+		/// <returns>The index offsets as array.</returns>
+		public static int[] ConvertToInTileIndexOffsets(int[] neighbouresXYOffsets, int tileWidth)
+		{
+			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
+			if (tileWidth < 1) throw new ArgumentOutOfRangeException(nameof(tileWidth), "Must be greater zero (0).");
+			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
+
+			var ret = new int[neighbouresXYOffsets.Length / 2];
+			for (int i = 0, j = 0; j < ret.Length;)
+			{
+				int x = neighbouresXYOffsets[i++];
+				int y = neighbouresXYOffsets[i++];
+				ret[j++] = y * tileWidth + x;
+			}
+			return ret;
+		}
+		#endregion
+
 		#region Constructors
 		/// <summary>
 		/// Creates a new instance.
@@ -436,78 +510,6 @@ namespace Free.Core.Drawing
 
 		#region Morphological operations
 		/// <summary>
-		/// Caches the neighbouresXYOffsets and maxDistance values for previous requested radii.
-		/// </summary>
-		public static Dictionary<double, Tuple<int, int[]>> NeighbouresXYOffsetsCache = new Dictionary<double, Tuple<int, int[]>>();
-
-		/// <summary>
-		/// Generates the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.
-		/// </summary>
-		/// <param name="radius">The radius.</param>
-		/// <param name="maxDistance">The maximum integral distance in x or y dimension of a lattice point to the center.</param>
-		/// <returns>An array containing the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.</returns>
-		public static int[] GenerateNeighbouresXYOffsets(double radius, out int maxDistance)
-		{
-			if (double.IsInfinity(radius) || double.IsNaN(radius)) throw new ArgumentException("Must be a valid, non-infinte number.", nameof(radius));
-
-			// Let's check the cache, whether we already calculated maxDistance and array for the given radius.
-			Tuple<int, int[]> cached;
-			if (NeighbouresXYOffsetsCache.TryGetValue(radius, out cached))
-			{
-				maxDistance = cached.Item1;
-				return cached.Item2;
-			}
-
-			// We could throw here, but that seems to be overkill, since we can fix this.
-			double radiusAbs = Math.Abs(radius);
-			if (radiusAbs < 1) radiusAbs = 1;
-
-			int rad = (int)Math.Floor(radiusAbs);
-
-			var ret = new List<int>();
-			for (var y = -rad; y <= rad; y++)
-			{
-				for (var x = -rad; x <= rad; x++)
-				{
-					if (y * y + x * x > radiusAbs * radiusAbs) continue;
-					ret.Add(x);
-					ret.Add(y);
-				}
-			}
-
-			int[] retArray = ret.ToArray();
-			lock (NeighbouresXYOffsetsCache)
-			{
-				NeighbouresXYOffsetsCache[radius] = new Tuple<int, int[]>(rad, retArray);
-			}
-
-			maxDistance = rad;
-			return retArray;
-		}
-
-		/// <summary>
-		/// Converts the alternating relative x- and y-coordinate values into index offsets for a specified <paramref name="tileWidth"/>.
-		/// </summary>
-		/// <param name="neighbouresXYOffsets">The array with alternating relative x- and y-coordinate values.</param>
-		/// <param name="tileWidth">The tile width.</param>
-		/// <returns>The index offsets as array.</returns>
-		public static int[] ConvertToInTileIndexOffsets(int[] neighbouresXYOffsets, int tileWidth)
-		{
-			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
-			if (tileWidth < 1) throw new ArgumentOutOfRangeException(nameof(tileWidth), "Must be greater zero (0).");
-			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
-
-			var ret = new int[neighbouresXYOffsets.Length / 2];
-			for (int i = 0, j = 0; j < ret.Length;)
-			{
-				int x = neighbouresXYOffsets[i++];
-				int y = neighbouresXYOffsets[i++];
-				ret[j++] = y * tileWidth + x;
-			}
-			return ret;
-		}
-
-		/// <summary>
 		/// Dilates the default(<typeparamref name="T"/>) regions.
 		/// </summary>
 		/// <param name="radius">The radius.</param>
@@ -590,7 +592,7 @@ namespace Free.Core.Drawing
 
 								int xTile = x / tileWidth, yTile = y / tileHeight, xInTile = x % tileWidth, yInTile = y % tileHeight;
 
-								if (Data[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile].Equals(default(T)))
+								if (orgData[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile].Equals(default(T)))
 								{
 									retTile[index] = default(T);
 									found = true;
@@ -690,7 +692,7 @@ namespace Free.Core.Drawing
 
 								int xTile = x / tileWidth, yTile = y / tileHeight, xInTile = x % tileWidth, yInTile = y % tileHeight;
 
-								if (!Data[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile].Equals(default(T)))
+								if (!orgData[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile].Equals(default(T)))
 								{
 									retTile[index] = newValue;
 									break;
@@ -820,7 +822,7 @@ namespace Free.Core.Drawing
 
 								int xTile = x / tileWidth, yTile = y / tileHeight, xInTile = x % tileWidth, yInTile = y % tileHeight;
 
-								structurElement[a] = Data[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile];
+								structurElement[a] = orgData[yTile * numberOfTileX + xTile][yInTile * tileWidth + xInTile];
 							}
 						}
 
