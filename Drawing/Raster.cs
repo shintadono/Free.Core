@@ -187,9 +187,9 @@ namespace Free.Core.Drawing
 
 		#region Statics
 		/// <summary>
-		/// Caches the neighbouresXYOffsets and maxDistance values for previous requested radii.
+		/// Caches the neighboursXYOffsets and maxDistance values for previous requested radii.
 		/// </summary>
-		public static Dictionary<double, Tuple<int, int[]>> NeighbouresXYOffsetsCache = new Dictionary<double, Tuple<int, int[]>>();
+		public static Dictionary<double, Tuple<int, int[]>> NeighboursXYOffsetsCache = new Dictionary<double, Tuple<int, int[]>>();
 
 		/// <summary>
 		/// Generates the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.
@@ -197,13 +197,13 @@ namespace Free.Core.Drawing
 		/// <param name="radius">The radius.</param>
 		/// <param name="maxDistance">The maximum integral distance in x or y dimension of a lattice point to the center.</param>
 		/// <returns>An array containing the relatives x- and y-coordinates of the elements at the lattice points with a maximum distance to the center of <paramref name="radius"/>.</returns>
-		public static int[] GenerateNeighbouresXYOffsets(double radius, out int maxDistance)
+		public static int[] GenerateNeighboursXYOffsets(double radius, out int maxDistance)
 		{
 			if (double.IsInfinity(radius) || double.IsNaN(radius)) throw new ArgumentException("Must be a valid, non-infinte number.", nameof(radius));
 
 			// Let's check the cache, whether we already calculated maxDistance and array for the given radius.
 			Tuple<int, int[]> cached;
-			if (NeighbouresXYOffsetsCache.TryGetValue(radius, out cached))
+			if (NeighboursXYOffsetsCache.TryGetValue(radius, out cached))
 			{
 				maxDistance = cached.Item1;
 				return cached.Item2;
@@ -227,9 +227,9 @@ namespace Free.Core.Drawing
 			}
 
 			int[] retArray = ret.ToArray();
-			lock (NeighbouresXYOffsetsCache)
+			lock (NeighboursXYOffsetsCache)
 			{
-				NeighbouresXYOffsetsCache[radius] = new Tuple<int, int[]>(rad, retArray);
+				NeighboursXYOffsetsCache[radius] = new Tuple<int, int[]>(rad, retArray);
 			}
 
 			maxDistance = rad;
@@ -239,20 +239,20 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Converts the alternating relative x- and y-coordinate values into index offsets for a specified <paramref name="tileWidth"/>.
 		/// </summary>
-		/// <param name="neighbouresXYOffsets">The array with alternating relative x- and y-coordinate values.</param>
+		/// <param name="neighboursXYOffsets">The array with alternating relative x- and y-coordinate values.</param>
 		/// <param name="tileWidth">The tile width.</param>
 		/// <returns>The index offsets as array.</returns>
-		public static int[] ConvertToInTileIndexOffsets(int[] neighbouresXYOffsets, int tileWidth)
+		public static int[] ConvertToInTileIndexOffsets(int[] neighboursXYOffsets, int tileWidth)
 		{
-			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
+			if (null == neighboursXYOffsets) throw new ArgumentNullException(nameof(neighboursXYOffsets));
 			if (tileWidth < 1) throw new ArgumentOutOfRangeException(nameof(tileWidth), "Must be greater zero (0).");
-			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
+			if (neighboursXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighboursXYOffsets));
 
-			var ret = new int[neighbouresXYOffsets.Length / 2];
+			var ret = new int[neighboursXYOffsets.Length / 2];
 			for (int i = 0, j = 0; j < ret.Length;)
 			{
-				int x = neighbouresXYOffsets[i++];
-				int y = neighbouresXYOffsets[i++];
+				int x = neighboursXYOffsets[i++];
+				int y = neighboursXYOffsets[i++];
 				ret[j++] = y * tileWidth + x;
 			}
 			return ret;
@@ -517,29 +517,29 @@ namespace Free.Core.Drawing
 		public Raster<T> Dilation(double radius)
 		{
 			int maxDistance;
-			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
+			var neighboursXYOffsets = GenerateNeighboursXYOffsets(radius, out maxDistance);
 
-			return Dilation(maxDistance, ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth), neighbouresXYOffsets);
+			return Dilation(maxDistance, ConvertToInTileIndexOffsets(neighboursXYOffsets, TileWidth), neighboursXYOffsets);
 		}
 
 		/// <summary>
 		/// Dilates the default(<typeparamref name="T"/>) regions.
 		/// </summary>
 		/// <param name="maxDistance">Distance of the furthest 'structuring elements' in one dimension from the current position [in number of cells].</param>
-		/// <param name="neighbouresInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
-		/// <param name="neighbouresXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
+		/// <param name="neighboursInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
+		/// <param name="neighboursXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
 		/// <returns>The raster with dilated default(<typeparamref name="T"/>) regions. Undilated cells keep their value.</returns>
-		public Raster<T> Dilation(int maxDistance, int[] neighbouresInTileIndexOffsets, int[] neighbouresXYOffsets)
+		public Raster<T> Dilation(int maxDistance, int[] neighboursInTileIndexOffsets, int[] neighboursXYOffsets)
 		{
 			if (maxDistance <= 0) throw new ArgumentException("Must be greater than zero(0).", nameof(maxDistance));
-			if (null == neighbouresInTileIndexOffsets) throw new ArgumentNullException(nameof(neighbouresInTileIndexOffsets));
-			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length / 2 != neighbouresInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighbouresInTileIndexOffsets) + ".", nameof(neighbouresXYOffsets));
+			if (null == neighboursInTileIndexOffsets) throw new ArgumentNullException(nameof(neighboursInTileIndexOffsets));
+			if (null == neighboursXYOffsets) throw new ArgumentNullException(nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length / 2 != neighboursInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighboursInTileIndexOffsets) + ".", nameof(neighboursXYOffsets));
 
 			// Local copies are faster.
 			var dist = maxDistance;
-			int[] nitio = neighbouresInTileIndexOffsets, nxyo = neighbouresXYOffsets;
+			int[] nitio = neighboursInTileIndexOffsets, nxyo = neighboursXYOffsets;
 			int width = Width, height = Height, tileWidth = TileWidth, tileHeight = TileHeight, numberOfTileX = NumberOfTileX;
 			var orgData = Data;
 
@@ -560,7 +560,7 @@ namespace Free.Core.Drawing
 
 				Parallel.For(0, amountY, line =>
 				{
-					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+					bool fast = line > dist && line < amountY - dist; // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 
 					var index = line * tileWidth;
 
@@ -569,7 +569,7 @@ namespace Free.Core.Drawing
 					for (int samp = 0; samp < amountX; samp++, index++)
 					{
 						bool found = false;
-						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 						{
 							for (int i = 0; i < nitio.Length; i++)
 							{
@@ -617,31 +617,31 @@ namespace Free.Core.Drawing
 		public Raster<T> Erosion(double radius, T newValue)
 		{
 			int maxDistance;
-			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
+			var neighboursXYOffsets = GenerateNeighboursXYOffsets(radius, out maxDistance);
 
-			return Erosion(maxDistance, ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth), neighbouresXYOffsets, newValue);
+			return Erosion(maxDistance, ConvertToInTileIndexOffsets(neighboursXYOffsets, TileWidth), neighboursXYOffsets, newValue);
 		}
 
 		/// <summary>
 		/// Erodes the default(<typeparamref name="T"/>) regions.
 		/// </summary>
 		/// <param name="maxDistance">Distance of the furthest 'structuring elements' in one dimension from the current position [in number of cells].</param>
-		/// <param name="neighbouresInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
-		/// <param name="neighbouresXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
+		/// <param name="neighboursInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
+		/// <param name="neighboursXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
 		/// <param name="newValue">The value to use for non-default(<typeparamref name="T"/>) cells. Must be a non-default(<typeparamref name="T"/>) value.</param>
 		/// <returns>The raster with values default((<typeparamref name="T"/>) and <paramref name="newValue"/>.</returns>
-		public Raster<T> Erosion(int maxDistance, int[] neighbouresInTileIndexOffsets, int[] neighbouresXYOffsets, T newValue)
+		public Raster<T> Erosion(int maxDistance, int[] neighboursInTileIndexOffsets, int[] neighboursXYOffsets, T newValue)
 		{
 			if (maxDistance <= 0) throw new ArgumentException("Must be greater than zero(0).", nameof(maxDistance));
-			if (null == neighbouresInTileIndexOffsets) throw new ArgumentNullException(nameof(neighbouresInTileIndexOffsets));
-			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length / 2 != neighbouresInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighbouresInTileIndexOffsets) + ".", nameof(neighbouresXYOffsets));
+			if (null == neighboursInTileIndexOffsets) throw new ArgumentNullException(nameof(neighboursInTileIndexOffsets));
+			if (null == neighboursXYOffsets) throw new ArgumentNullException(nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length / 2 != neighboursInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighboursInTileIndexOffsets) + ".", nameof(neighboursXYOffsets));
 			if (newValue.Equals(default(T))) throw new ArgumentException("Must be a non-default value.", nameof(newValue));
 
 			// Local copies are faster.
 			var dist = maxDistance;
-			int[] nitio = neighbouresInTileIndexOffsets, nxyo = neighbouresXYOffsets;
+			int[] nitio = neighboursInTileIndexOffsets, nxyo = neighboursXYOffsets;
 			int width = Width, height = Height, tileWidth = TileWidth, tileHeight = TileHeight, numberOfTileX = NumberOfTileX;
 			var orgData = Data;
 
@@ -662,7 +662,7 @@ namespace Free.Core.Drawing
 
 				Parallel.For(0, amountY, line =>
 				{
-					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+					bool fast = line > dist && line < amountY - dist; // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 
 					var index = line * tileWidth;
 
@@ -670,7 +670,7 @@ namespace Free.Core.Drawing
 
 					for (int samp = 0; samp < amountX; samp++, index++)
 					{
-						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 						{
 							for (int i = 0; i < nitio.Length; i++)
 							{
@@ -714,10 +714,10 @@ namespace Free.Core.Drawing
 		public Raster<T> Opening(double radius, T newValue)
 		{
 			int maxDistance;
-			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
-			var neighbouresInTileIndexOffsets = ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth);
+			var neighboursXYOffsets = GenerateNeighboursXYOffsets(radius, out maxDistance);
+			var neighboursInTileIndexOffsets = ConvertToInTileIndexOffsets(neighboursXYOffsets, TileWidth);
 
-			return Erosion(maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets, newValue).Dilation(maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets);
+			return Erosion(maxDistance, neighboursInTileIndexOffsets, neighboursXYOffsets, newValue).Dilation(maxDistance, neighboursInTileIndexOffsets, neighboursXYOffsets);
 		}
 
 		/// <summary>
@@ -729,10 +729,10 @@ namespace Free.Core.Drawing
 		public Raster<T> Closing(double radius, T newValue)
 		{
 			int maxDistance;
-			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
-			var neighbouresInTileIndexOffsets = ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth);
+			var neighboursXYOffsets = GenerateNeighboursXYOffsets(radius, out maxDistance);
+			var neighboursInTileIndexOffsets = ConvertToInTileIndexOffsets(neighboursXYOffsets, TileWidth);
 
-			return Dilation(maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets).Erosion(maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets, newValue);
+			return Dilation(maxDistance, neighboursInTileIndexOffsets, neighboursXYOffsets).Erosion(maxDistance, neighboursInTileIndexOffsets, neighboursXYOffsets, newValue);
 		}
 		#endregion
 
@@ -747,10 +747,10 @@ namespace Free.Core.Drawing
 		public Raster<A> Filter<A>(Func<T[], A> filterOperation, double radius, T borderValue) where A : struct, IEquatable<A>
 		{
 			int maxDistance;
-			var neighbouresXYOffsets = GenerateNeighbouresXYOffsets(radius, out maxDistance);
-			var neighbouresInTileIndexOffsets = ConvertToInTileIndexOffsets(neighbouresXYOffsets, TileWidth);
+			var neighboursXYOffsets = GenerateNeighboursXYOffsets(radius, out maxDistance);
+			var neighboursInTileIndexOffsets = ConvertToInTileIndexOffsets(neighboursXYOffsets, TileWidth);
 
-			return Filter(filterOperation, maxDistance, neighbouresInTileIndexOffsets, neighbouresXYOffsets, borderValue);
+			return Filter(filterOperation, maxDistance, neighboursInTileIndexOffsets, neighboursXYOffsets, borderValue);
 		}
 
 		/// <summary>
@@ -758,21 +758,21 @@ namespace Free.Core.Drawing
 		/// </summary>
 		/// <param name="filterOperation">The function to calculate the result value for a structure element.</param>
 		/// <param name="maxDistance">Distance of the furthest 'structuring elements' in one dimension from the current position [in number of cells].</param>
-		/// <param name="neighbouresInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
-		/// <param name="neighbouresXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
+		/// <param name="neighboursInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>
+		/// <param name="neighboursXYOffsets">Alternating relative x and y coordinate to the current position which define the structuring elements.</param>
 		/// <param name="borderValue">The value to be given to the <paramref name="filterOperation"/> for elements outside of the raster.</param>
 		/// <returns>The raster with the filtered values.</returns>
-		public Raster<A> Filter<A>(Func<T[], A> filterOperation, int maxDistance, int[] neighbouresInTileIndexOffsets, int[] neighbouresXYOffsets, T borderValue) where A : struct, IEquatable<A>
+		public Raster<A> Filter<A>(Func<T[], A> filterOperation, int maxDistance, int[] neighboursInTileIndexOffsets, int[] neighboursXYOffsets, T borderValue) where A : struct, IEquatable<A>
 		{
 			if (maxDistance <= 0) throw new ArgumentException("Must be greater than zero(0).", nameof(maxDistance));
-			if (null == neighbouresInTileIndexOffsets) throw new ArgumentNullException(nameof(neighbouresInTileIndexOffsets));
-			if (null == neighbouresXYOffsets) throw new ArgumentNullException(nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighbouresXYOffsets));
-			if (neighbouresXYOffsets.Length / 2 != neighbouresInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighbouresInTileIndexOffsets) + ".", nameof(neighbouresXYOffsets));
+			if (null == neighboursInTileIndexOffsets) throw new ArgumentNullException(nameof(neighboursInTileIndexOffsets));
+			if (null == neighboursXYOffsets) throw new ArgumentNullException(nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length % 2 != 0) throw new ArgumentException("Must have an even number of elements.", nameof(neighboursXYOffsets));
+			if (neighboursXYOffsets.Length / 2 != neighboursInTileIndexOffsets.Length) throw new ArgumentException("Must have twice as many elements than " + nameof(neighboursInTileIndexOffsets) + ".", nameof(neighboursXYOffsets));
 
 			// Local copies are faster.
 			var dist = maxDistance;
-			int[] nitio = neighbouresInTileIndexOffsets, nxyo = neighbouresXYOffsets;
+			int[] nitio = neighboursInTileIndexOffsets, nxyo = neighboursXYOffsets;
 			int width = Width, height = Height, tileWidth = TileWidth, tileHeight = TileHeight, numberOfTileX = NumberOfTileX;
 			var orgData = Data;
 
@@ -793,7 +793,7 @@ namespace Free.Core.Drawing
 
 				Parallel.For(0, amountY, line =>
 				{
-					bool fast = line > dist && line < amountY - dist; // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+					bool fast = line > dist && line < amountY - dist; // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 
 					var index = line * tileWidth;
 
@@ -803,7 +803,7 @@ namespace Free.Core.Drawing
 
 					for (int samp = 0; samp < amountX; samp++, index++)
 					{
-						if (fast && samp > dist && samp < amountX - dist) // We can use the neighbouresInTileIndexOffsets when we're not at the border of the tile.
+						if (fast && samp > dist && samp < amountX - dist) // We can use the neighboursInTileIndexOffsets when we're not at the border of the tile.
 						{
 							for (int i = 0; i < nitio.Length; i++) structurElement[i] = orgTile[index + nitio[i]];
 						}
