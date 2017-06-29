@@ -740,6 +740,7 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Performs a <paramref name="filterOperation"/> on a <see cref="Raster{T}"/>.
 		/// </summary>
+		/// <typeparam name="A">The type of the resulting <see cref="Raster{T}"/>.</typeparam>
 		/// <param name="filterOperation">The function to calculate the result value for a structure element.</param>
 		/// <param name="radius">The radius.</param>
 		/// <param name="borderValue">The value to be given to the <paramref name="filterOperation"/> for elements outside of the raster.</param>
@@ -756,6 +757,7 @@ namespace Free.Core.Drawing
 		/// <summary>
 		/// Performs a <paramref name="filterOperation"/> on a <see cref="Raster{T}"/>.
 		/// </summary>
+		/// <typeparam name="A">The type of the resulting <see cref="Raster{T}"/>.</typeparam>
 		/// <param name="filterOperation">The function to calculate the result value for a structure element.</param>
 		/// <param name="maxDistance">Distance of the furthest 'structuring elements' in one dimension from the current position [in number of cells].</param>
 		/// <param name="neighboursInTileIndexOffsets">Relative index offset to the current position in a tile which define the structuring elements.</param>

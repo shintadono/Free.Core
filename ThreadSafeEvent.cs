@@ -34,6 +34,8 @@ namespace Free.Core
 		/// <summary>
 		/// Fires the event.
 		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The event arguments.</param>
 		public virtual void Fire(object sender, EventArgs e)
 		{
 			EventHandler handler;
@@ -97,6 +99,8 @@ namespace Free.Core
 		/// <summary>
 		/// Fires the event.
 		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The event arguments.</param>
 		public void Fire(object sender, T e)
 		{
 			EventHandler<T> handler;
