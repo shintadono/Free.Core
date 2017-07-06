@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Free.Core.Collections.Generic.Extensions
 {
 	/// <summary>
-	/// Added methods to the <see cref="List{T}"/> class.
+	/// Adds methods to the <see cref="List{T}"/> class.
 	/// </summary>
 	public static class ListExtensions
 	{

@@ -8,7 +8,7 @@
 //namespace Free.Core.Collections.Generic.Extensions
 //{
 //	/// <summary>
-//	/// Added methods to the <see cref="List{T}"/> class. When the element type is a value type (<b>int</b>, <b>struct</b>, etc.).
+//	/// Adds methods to the <see cref="List{T}"/> class. When the element type is a value type (<b>int</b>, <b>struct</b>, etc.).
 //	/// </summary>
 //	public static class ListOfStructExtensions
 //	{

@@ -5,7 +5,7 @@ using Free.Core.Generic;
 namespace Free.Core.Collections.Generic.Extensions
 {
 	/// <summary>
-	/// Added methods to the <see cref="List{T}"/> class. When the element type is a <b>class</b> and derived from <see cref="ICopy{T}"/>.
+	/// Adds methods to the <see cref="List{T}"/> class. When the element type is a <b>class</b> and derived from <see cref="ICopy{T}"/>.
 	/// </summary>
 	public static class ListOfICopyExtensions
 	{
