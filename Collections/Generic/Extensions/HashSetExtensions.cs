@@ -32,6 +32,8 @@ namespace Free.Core.Collections.Generic.Extensions
 			foreach (var a in hashSet)
 			{
 				count++;
+				if (count >= hashSet.Count) yield break;
+
 				secondIter.Reset();
 				for (int i = 0; i < count; i++) secondIter.MoveNext(); // Skip count in secondIter.
 
@@ -58,6 +60,8 @@ namespace Free.Core.Collections.Generic.Extensions
 			foreach (var a in hashSet)
 			{
 				count++;
+				if (count >= hashSet.Count) return;
+
 				secondIter.Reset();
 				for (int i = 0; i < count; i++) secondIter.MoveNext(); // Skip count in secondIter.
 
