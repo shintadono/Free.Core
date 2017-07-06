@@ -55,6 +55,7 @@
     <Compile Include="Collections\Generic\CachingCreator.cs" />
     <Compile Include="Collections\Generic\DoubleLinkedRing.cs" />
     <Compile Include="Collections\Generic\DoubleLinkedRingNode.cs" />
+    <Compile Include="Collections\Generic\Extensions\HashSetExtensions.cs" />
     <Compile Include="Collections\Generic\Extensions\ListExtensions.cs" />
     <Compile Include="Collections\Generic\Extensions\ListOfICopyExtensions.cs" />
     <Compile Include="Collections\Generic\Extensions\ListOfStructExtensions.cs" />
