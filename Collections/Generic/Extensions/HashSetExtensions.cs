@@ -15,14 +15,14 @@ namespace Free.Core.Collections.Generic.Extensions
 		/// <typeparam name="T">The type of the elements in the <paramref name="hashSet"/> and the returned <see cref="Tuple{T1, T2}"/>.</typeparam>
 		/// <param name="hashSet">The hash set with the elements.</param>
 		/// <returns>An enumeration of <see cref="Tuple{T1, T2}"/>, providing all combininations of elements.</returns>
-		public static IEnumerable<Tuple<T, T>> GetAllCombinations<T>(this HashSet<T> hashSet)
+		public static IEnumerable<Tuple<T, T>> ForAllCombinations<T>(this HashSet<T> hashSet)
 		{
 			if (null == hashSet) throw new ArgumentNullException(nameof(hashSet));
 
-			return GetAllCombinationsEnumerable(hashSet);
+			return ForAllCombinationsEnumerable(hashSet);
 		}
 
-		static IEnumerable<Tuple<T, T>> GetAllCombinationsEnumerable<T>(this HashSet<T> hashSet)
+		static IEnumerable<Tuple<T, T>> ForAllCombinationsEnumerable<T>(this HashSet<T> hashSet)
 		{
 			if (hashSet.Count <= 1) yield break;
 
@@ -40,13 +40,13 @@ namespace Free.Core.Collections.Generic.Extensions
 		}
 
 		/// <summary>
-		/// Visits all combination of elements in the specified <paramref name="hashSet"/> and performing a specified <paramref name="action"/>.
+		/// For all combinations of elements in the specified <paramref name="hashSet"/> a specified <paramref name="action"/> is performed.
 		/// The order of the elements in the <paramref name="action"/> is undefinied. Each combination of elements is only invoked once.
 		/// </summary>
 		/// <typeparam name="T">The type of the elements in the <paramref name="hashSet"/> and <paramref name="action"/>.</typeparam>
 		/// <param name="hashSet">The hash set with the elements.</param>
 		/// <param name="action">The action to perform with each combination of elements.</param>
-		public static void VisitAllCombinations<T>(this HashSet<T> hashSet, Action<T, T> action)
+		public static void ForAllCombinations<T>(this HashSet<T> hashSet, Action<T, T> action)
 		{
 			if (null == hashSet) throw new ArgumentNullException(nameof(hashSet));
 			if (null == action) throw new ArgumentNullException(nameof(action));
