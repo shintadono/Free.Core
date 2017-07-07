@@ -26,19 +26,33 @@ namespace Free.Core.Collections.Generic.Extensions
 		{
 			if (hashSet.Count <= 1) yield break;
 
-			IEnumerator<T> secondIter = hashSet.GetEnumerator(); // We use a second iterator that we can reset to avoid creating instances over and over again.
-
-			int count = 0;
-			foreach (var a in hashSet)
+			//if (typeof(HashSet<T>.Enumerator).IsValueType)
 			{
-				count++;
-				if (count >= hashSet.Count) yield break;
+				HashSet<T>.Enumerator iter = hashSet.GetEnumerator();
 
-				secondIter.Reset();
-				for (int i = 0; i < count; i++) secondIter.MoveNext(); // Skip count in secondIter.
-
-				while (secondIter.MoveNext()) yield return new Tuple<T, T>(a, secondIter.Current);
+				while (iter.MoveNext())
+				{
+					T a = iter.Current;
+					HashSet<T>.Enumerator secondIter = iter; // Since the enumerator is a struct, we can copy the current content and don't need to fast forward the the right location.
+					while (secondIter.MoveNext()) yield return new Tuple<T, T>(a, secondIter.Current);
+				}
 			}
+			//else
+			//{
+			//	IEnumerator<T> secondIter = hashSet.GetEnumerator(); // We use a second iterator that we can reset to avoid creating instances over and over again.
+
+			//	int count = 0;
+			//	foreach (var a in hashSet)
+			//	{
+			//		count++;
+			//		if (count >= hashSet.Count) yield break;
+
+			//		secondIter.Reset();
+			//		for (int i = 0; i < count; i++) secondIter.MoveNext(); // Fast forward to the right location in secondIter.
+
+			//		while (secondIter.MoveNext()) yield return new Tuple<T, T>(a, secondIter.Current);
+			//	}
+			//}
 		}
 
 		/// <summary>
@@ -54,19 +68,33 @@ namespace Free.Core.Collections.Generic.Extensions
 			if (null == action) throw new ArgumentNullException(nameof(action));
 			if (hashSet.Count <= 1) return;
 
-			IEnumerator<T> secondIter = hashSet.GetEnumerator(); // We use a second iterator that we can reset to avoid creating instances over and over again.
-
-			int count = 0;
-			foreach (var a in hashSet)
+			//if (typeof(HashSet<T>.Enumerator).IsValueType)
 			{
-				count++;
-				if (count >= hashSet.Count) return;
+				HashSet<T>.Enumerator iter = hashSet.GetEnumerator();
 
-				secondIter.Reset();
-				for (int i = 0; i < count; i++) secondIter.MoveNext(); // Skip count in secondIter.
-
-				while (secondIter.MoveNext()) action(a, secondIter.Current);
+				while (iter.MoveNext())
+				{
+					T a = iter.Current;
+					HashSet<T>.Enumerator secondIter = iter; // Since the enumerator is a struct, we can copy the current content and don't need to fast forward the the right location.
+					while (secondIter.MoveNext()) action(a, secondIter.Current);
+				}
 			}
+			//else
+			//{
+			//	IEnumerator<T> secondIter = hashSet.GetEnumerator(); // We use a second iterator that we can reset to avoid creating instances over and over again.
+
+			//	int count = 0;
+			//	foreach (var a in hashSet)
+			//	{
+			//		count++;
+			//		if (count >= hashSet.Count) return;
+
+			//		secondIter.Reset();
+			//		for (int i = 0; i < count; i++) secondIter.MoveNext(); // Fast forward to the right location in secondIter.
+
+			//		while (secondIter.MoveNext()) action(a, secondIter.Current);
+			//	}
+			//}
 		}
 	}
 }
