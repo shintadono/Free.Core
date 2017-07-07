@@ -63,6 +63,8 @@
     <Compile Include="Collections\Generic\LinkedHashSet.cs" />
     <Compile Include="Collections\Generic\LinkedDictionary.cs" />
     <Compile Include="Collections\Generic\ResourceRecycler.cs" />
+    <Compile Include="Collections\Generic\StructList.cs" />
+    <Compile Include="Collections\Generic\StructList4.cs" />
     <Compile Include="Collections\Internal\PDLParser.cs" />
     <Compile Include="Collections\Internal\ParametersToPDLConverter.cs" />
     <Compile Include="Drawing\ChannelType.cs" />
